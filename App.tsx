@@ -10,7 +10,7 @@ const generateSteps = (count: number, chord: string = 'Am'): StrumStep[] => {
   return Array.from({ length: count }, (_, i) => ({
     id: `step-${Date.now()}-${i}`,
     direction: i % 2 === 0 ? 'down' : 'up',
-    isHit: i === 0 || i === 2 || i === 4 || i === 6,
+    strumType: (i === 0 || i === 2 || i === 4 || i === 6) ? 'strum' : 'ghost',
     chord: chord,
     lyrics: ''
   }));
@@ -116,7 +116,7 @@ const App: React.FC = () => {
           const added = Array.from({ length: newLen - currentLen }, (_, k) => ({
             id: `step-added-${Date.now()}-${k}`,
             direction: (currentLen + k) % 2 === 0 ? 'down' : 'up' as any,
-            isHit: false,
+            strumType: 'ghost',
             chord: currentChord,
             lyrics: ''
           }));
@@ -162,9 +162,7 @@ const App: React.FC = () => {
     if (!step) return;
 
     // 1. Audio
-    if (step.isHit) {
-      audioEngine.strum(step.direction, step.chord, time);
-    }
+    audioEngine.strum(step.direction, step.chord, step.strumType, time);
 
     // 2. Visuals
     const currentTime = audioEngine.currentTime;
@@ -336,7 +334,13 @@ const App: React.FC = () => {
                   key={step.id}
                   step={step}
                   isActive={currentDisplayStepIdx === index}
-                  onClick={() => updateStep(activeMeasureIdx, index, { isHit: !step.isHit })}
+                  onClick={() => {
+                    // Cycle: ghost -> strum -> mute -> ghost
+                    const nextType = step.strumType === 'ghost' ? 'strum'
+                      : step.strumType === 'strum' ? 'mute'
+                      : 'ghost';
+                    updateStep(activeMeasureIdx, index, { strumType: nextType });
+                  }}
                   onLyricsChange={(text) => updateStep(activeMeasureIdx, index, { lyrics: text })}
                 />
               ))}
@@ -344,7 +348,7 @@ const App: React.FC = () => {
           </div>
           <p className="text-center text-slate-500 mt-6 flex items-center justify-center gap-2 text-sm">
             <Info size={16} />
-            <span className="hidden md:inline">Edit mode:</span> Tap arrow to toggle Hit/Pass. Type below arrow for lyrics.
+            <span className="hidden md:inline">Edit mode:</span> Tap arrow to cycle: Strum &rarr; Mute &rarr; Ghost. Type below arrow for lyrics.
           </p>
         </div>
 

@@ -1,9 +1,10 @@
 export type StrumDirection = 'down' | 'up';
+export type StrumType = 'strum' | 'mute' | 'ghost';
 
 export interface StrumStep {
   id: string;
   direction: StrumDirection;
-  isHit: boolean; // true = play chord, false = ghost strum (miss)
+  strumType: StrumType; // 'strum' = play chord, 'mute' = muted sound, 'ghost' = miss
   chord: string; // e.g., 'Am', 'C', 'G'
   lyrics: string; // Syllable associated with this beat
 }

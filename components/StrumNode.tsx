@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDown, ArrowUp, Circle, CircleDot } from 'lucide-react';
+import { ArrowDown, ArrowUp, Circle, CircleDot, X } from 'lucide-react';
 import { StrumStep } from '../types';
 
 interface StrumNodeProps {
@@ -12,11 +12,26 @@ interface StrumNodeProps {
 export const StrumNode: React.FC<StrumNodeProps> = ({ step, isActive, onClick, onLyricsChange }) => {
   const isDown = step.direction === 'down';
   
+  // Helper to determine styles based on strum type
+  const getStyles = () => {
+    if (isActive) return 'bg-amber-500 border-amber-400 text-white shadow-amber-500/50';
+    
+    switch (step.strumType) {
+      case 'strum':
+        return 'bg-slate-700 border-slate-600 text-slate-200 group-hover:bg-slate-600';
+      case 'mute':
+        return 'bg-rose-900/40 border-rose-800 text-rose-400 group-hover:bg-rose-900/60';
+      case 'ghost':
+      default:
+        return 'bg-slate-800/50 border-slate-700/50 text-slate-500 group-hover:bg-slate-800';
+    }
+  };
+
   return (
     <div className="flex flex-col items-center gap-2 group select-none">
       
       {/* Clickable Arrow Area */}
-      <div 
+      <div
         onClick={onClick}
         className={`
           relative flex flex-col items-center justify-center gap-3 cursor-pointer
@@ -25,16 +40,11 @@ export const StrumNode: React.FC<StrumNodeProps> = ({ step, isActive, onClick, o
         `}
       >
         {/* Arrow Indicator */}
-        <div 
+        <div
           className={`
             w-16 h-24 rounded-2xl flex items-center justify-center shadow-lg border-2
             transition-colors duration-150
-            ${isActive 
-              ? 'bg-amber-500 border-amber-400 text-white shadow-amber-500/50' 
-              : step.isHit 
-                ? 'bg-slate-700 border-slate-600 text-slate-200 group-hover:bg-slate-600' 
-                : 'bg-slate-800/50 border-slate-700/50 text-slate-500 group-hover:bg-slate-800'
-            }
+            ${getStyles()}
           `}
         >
           {isDown ? (
@@ -44,18 +54,18 @@ export const StrumNode: React.FC<StrumNodeProps> = ({ step, isActive, onClick, o
           )}
         </div>
 
-        {/* Hit/Miss Indicator */}
-        <div 
+        {/* Type Indicator */}
+        <div
           className={`
             transition-colors duration-200
-            ${isActive ? 'text-amber-400' : step.isHit ? 'text-emerald-400' : 'text-slate-600'}
+            ${isActive ? 'text-amber-400' :
+              step.strumType === 'strum' ? 'text-emerald-400' :
+              step.strumType === 'mute' ? 'text-rose-400' : 'text-slate-600'}
           `}
         >
-          {step.isHit ? (
-            <CircleDot size={20} fill="currentColor" className="opacity-80" />
-          ) : (
-            <Circle size={20} className="opacity-50" />
-          )}
+          {step.strumType === 'strum' && <CircleDot size={20} fill="currentColor" className="opacity-80" />}
+          {step.strumType === 'mute' && <X size={20} className="opacity-80" />}
+          {step.strumType === 'ghost' && <Circle size={20} className="opacity-50" />}
         </div>
 
         {/* Active Glow */}
