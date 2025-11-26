@@ -1,0 +1,376 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { StrumStep, Measure } from './types';
+import { StrumNode } from './components/StrumNode';
+import { Controls } from './components/Controls';
+import { audioEngine } from './services/audioEngine';
+import { Music, Volume2, Info, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
+
+// Default pattern generator
+const generateSteps = (count: number, chord: string = 'Am'): StrumStep[] => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `step-${Date.now()}-${i}`,
+    direction: i % 2 === 0 ? 'down' : 'up',
+    isHit: i === 0 || i === 2 || i === 4 || i === 6,
+    chord: chord,
+    lyrics: ''
+  }));
+};
+
+const createMeasure = (id: number, chord: string = 'Am'): Measure => ({
+  id: `measure-${Date.now()}-${id}`,
+  steps: generateSteps(8, chord)
+});
+
+const App: React.FC = () => {
+  // --- STATE ---
+  const [bpm, setBpm] = useState(90);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  // Data State
+  const [measures, setMeasures] = useState<Measure[]>([createMeasure(0, 'Am')]);
+  const [activeMeasureIdx, setActiveMeasureIdx] = useState(0);
+
+  // Playback State
+  // We track the *global* position relative to the current measure during playback
+  const [currentDisplayStepIdx, setCurrentDisplayStepIdx] = useState<number | null>(null);
+
+  // --- REFS (for Scheduler) ---
+  const nextNoteTimeRef = useRef<number>(0);
+  const currentMeasureIdxRef = useRef<number>(0);
+  const currentStepIdxRef = useRef<number>(0);
+  const timerIDRef = useRef<number | null>(null);
+  
+  const measuresRef = useRef(measures);
+  const bpmRef = useRef(bpm);
+  const visualTimeoutsRef = useRef<number[]>([]);
+
+  // Constants
+  const LOOKAHEAD = 25.0; 
+  const SCHEDULE_AHEAD_TIME = 0.1;
+
+  // Sync refs
+  useEffect(() => {
+    measuresRef.current = measures;
+  }, [measures]);
+
+  useEffect(() => {
+    bpmRef.current = bpm;
+  }, [bpm]);
+
+  // --- ACTIONS ---
+
+  const handleMeasureChange = (delta: number) => {
+    const newIndex = Math.max(0, Math.min(measures.length - 1, activeMeasureIdx + delta));
+    setActiveMeasureIdx(newIndex);
+  };
+
+  const addMeasure = () => {
+    const lastMeasure = measures[measures.length - 1];
+    // Copy chord from last measure for continuity
+    const lastChord = lastMeasure.steps[0]?.chord || 'Am';
+    setMeasures(prev => [...prev, createMeasure(prev.length, lastChord)]);
+    setActiveMeasureIdx(measures.length); // Jump to new
+  };
+
+  const removeMeasure = () => {
+    if (measures.length <= 1) return;
+    setMeasures(prev => {
+      const newMeasures = prev.filter((_, i) => i !== activeMeasureIdx);
+      return newMeasures;
+    });
+    setActiveMeasureIdx(prev => Math.max(0, prev - 1));
+  };
+
+  const updateChordForMeasure = (chord: string) => {
+    setMeasures(prev => prev.map((m, i) => {
+      if (i === activeMeasureIdx) {
+        return {
+          ...m,
+          steps: m.steps.map(s => ({ ...s, chord }))
+        };
+      }
+      return m;
+    }));
+  };
+
+  const updateStep = (measureIdx: number, stepIdx: number, updates: Partial<StrumStep>) => {
+    setMeasures(prev => prev.map((m, i) => {
+      if (i === measureIdx) {
+        const newSteps = [...m.steps];
+        newSteps[stepIdx] = { ...newSteps[stepIdx], ...updates };
+        return { ...m, steps: newSteps };
+      }
+      return m;
+    }));
+  };
+
+  const changeStepCount = (delta: number) => {
+    setMeasures(prev => prev.map((m, i) => {
+      if (i === activeMeasureIdx) {
+        const currentLen = m.steps.length;
+        const newLen = Math.max(4, Math.min(16, currentLen + delta));
+        const currentChord = m.steps[0]?.chord || 'Am';
+        
+        let newSteps = [...m.steps];
+        if (newLen > currentLen) {
+          const added = Array.from({ length: newLen - currentLen }, (_, k) => ({
+            id: `step-added-${Date.now()}-${k}`,
+            direction: (currentLen + k) % 2 === 0 ? 'down' : 'up' as any,
+            isHit: false,
+            chord: currentChord,
+            lyrics: ''
+          }));
+          newSteps = [...newSteps, ...added];
+        } else {
+          newSteps = newSteps.slice(0, newLen);
+        }
+        return { ...m, steps: newSteps };
+      }
+      return m;
+    }));
+  };
+
+  // --- SCHEDULING LOGIC ---
+
+  // NOTE: nextNote must be stable to prevent scheduler re-creation
+  const nextNote = useCallback(() => {
+    const secondsPerBeat = 60.0 / bpmRef.current;
+    const secondsPerEighth = secondsPerBeat / 2;
+    nextNoteTimeRef.current += secondsPerEighth;
+    
+    // Advance logic
+    const currentMeasure = measuresRef.current[currentMeasureIdxRef.current];
+    currentStepIdxRef.current += 1;
+
+    // Check if end of measure
+    if (currentStepIdxRef.current >= currentMeasure.steps.length) {
+      currentStepIdxRef.current = 0;
+      currentMeasureIdxRef.current += 1;
+      
+      // Loop song
+      if (currentMeasureIdxRef.current >= measuresRef.current.length) {
+        currentMeasureIdxRef.current = 0;
+      }
+    }
+  }, []);
+
+  // NOTE: scheduleNote must be stable. Do not read state directly here, use functional updates.
+  const scheduleNote = useCallback((measureIdx: number, stepIdx: number, time: number) => {
+    const measure = measuresRef.current[measureIdx];
+    if (!measure) return;
+    const step = measure.steps[stepIdx];
+    if (!step) return;
+
+    // 1. Audio
+    if (step.isHit) {
+      audioEngine.strum(step.direction, step.chord, time);
+    }
+
+    // 2. Visuals
+    const currentTime = audioEngine.currentTime;
+    const delayMs = (time - currentTime) * 1000;
+
+    const timeoutId = window.setTimeout(() => {
+      // Functional update to avoid dependency on activeMeasureIdx state
+      setActiveMeasureIdx(prevIdx => {
+        if (prevIdx !== measureIdx) return measureIdx;
+        return prevIdx;
+      });
+      setCurrentDisplayStepIdx(stepIdx);
+    }, Math.max(0, delayMs));
+
+    visualTimeoutsRef.current.push(timeoutId);
+  }, []);
+
+  // NOTE: scheduler must be stable to prevent Effect from re-running and resetting playback
+  const scheduler = useCallback(() => {
+    if (nextNoteTimeRef.current < audioEngine.currentTime - 0.2) {
+        nextNoteTimeRef.current = audioEngine.currentTime;
+    }
+
+    while (nextNoteTimeRef.current < audioEngine.currentTime + SCHEDULE_AHEAD_TIME) {
+      scheduleNote(currentMeasureIdxRef.current, currentStepIdxRef.current, nextNoteTimeRef.current);
+      nextNote();
+    }
+    
+    timerIDRef.current = window.setTimeout(scheduler, LOOKAHEAD);
+  }, [nextNote, scheduleNote]); 
+
+  const handleTogglePlay = async () => {
+    if (isPlaying) {
+      setIsPlaying(false);
+    } else {
+      await audioEngine.resume();
+      setIsPlaying(true);
+    }
+  };
+
+  // Playback Effect
+  // Critical: This effect must ONLY re-run when isPlaying toggles. 
+  // It MUST NOT re-run when activeMeasureIdx changes, otherwise it resets the loop.
+  useEffect(() => {
+    if (isPlaying) {
+      // Start from the beginning of the CURRENT measure
+      currentMeasureIdxRef.current = activeMeasureIdx;
+      currentStepIdxRef.current = 0;
+      nextNoteTimeRef.current = audioEngine.currentTime + 0.1;
+      scheduler();
+    } else {
+      if (timerIDRef.current) window.clearTimeout(timerIDRef.current);
+      visualTimeoutsRef.current.forEach(id => window.clearTimeout(id));
+      visualTimeoutsRef.current = [];
+      setCurrentDisplayStepIdx(null);
+    }
+
+    return () => {
+      if (timerIDRef.current) window.clearTimeout(timerIDRef.current);
+      visualTimeoutsRef.current.forEach(id => window.clearTimeout(id));
+      visualTimeoutsRef.current = [];
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying, scheduler]); 
+
+  const activeMeasure = measures[activeMeasureIdx];
+  const currentChord = activeMeasure.steps[0]?.chord || 'Am';
+
+  return (
+    <div className="min-h-screen bg-slate-900 flex flex-col font-sans text-slate-100 selection:bg-amber-500/30">
+      
+      {/* Header */}
+      <header className="bg-slate-950/50 backdrop-blur-md border-b border-white/10 p-4 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-amber-400 to-orange-600 p-2 rounded-lg shadow-lg shadow-orange-500/20">
+              <Music className="text-white" size={24} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                StrumMaster
+              </h1>
+              <p className="text-xs text-slate-500 font-medium">Guitar Rhythm Trainer</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-mono text-slate-500 border border-slate-800 px-3 py-1 rounded-full">
+            <Volume2 size={12} />
+            <span>Synth Active</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-start p-4 md:p-8 gap-8 w-full max-w-6xl mx-auto">
+        
+        {/* Measure Navigation & Info */}
+        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-800/50 p-4 rounded-xl border border-white/5">
+          
+          {/* Navigation */}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => handleMeasureChange(-1)}
+              disabled={activeMeasureIdx === 0}
+              className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-lg transition-colors"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div className="flex flex-col items-center px-4 min-w-[100px]">
+              <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">Measure</span>
+              <span className="text-2xl font-mono font-bold text-white">
+                {activeMeasureIdx + 1} <span className="text-slate-500 text-lg">/ {measures.length}</span>
+              </span>
+            </div>
+            <button 
+              onClick={() => handleMeasureChange(1)}
+              disabled={activeMeasureIdx === measures.length - 1}
+              className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-lg transition-colors"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+
+          {/* Chord Editor */}
+          <div className="flex items-center gap-3">
+             <label className="text-sm text-slate-400 font-medium">Chord:</label>
+             <select 
+               value={currentChord} 
+               onChange={(e) => updateChordForMeasure(e.target.value)}
+               className="bg-slate-900 border border-slate-700 text-amber-400 font-bold text-lg rounded-lg px-3 py-1 focus:ring-2 focus:ring-amber-500 outline-none"
+             >
+               {['Am', 'A', 'C', 'G', 'D', 'Dm', 'E', 'Em', 'F'].map(c => (
+                 <option key={c} value={c}>{c}</option>
+               ))}
+             </select>
+          </div>
+
+          {/* Measure Actions */}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={addMeasure}
+              className="flex items-center gap-1 px-3 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg text-sm font-medium transition-colors border border-emerald-600/30"
+            >
+              <Plus size={16} /> Add Bar
+            </button>
+            {measures.length > 1 && (
+              <button 
+                onClick={removeMeasure}
+                className="p-2 bg-rose-900/20 hover:bg-rose-900/40 text-rose-400 rounded-lg transition-colors border border-rose-900/30"
+                title="Delete Current Measure"
+              >
+                <Trash2 size={18} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Visualizer Area */}
+        <div className="w-full overflow-x-auto pb-6 pt-2 custom-scrollbar">
+          <div className="flex justify-center min-w-max px-4">
+            <div className="relative flex gap-4 md:gap-6 bg-slate-950/40 p-8 pt-10 rounded-3xl border border-white/5 shadow-2xl">
+              
+              {/* Measure Chord Label Background */}
+              <div className="absolute top-3 left-4 text-slate-700 font-black text-6xl opacity-10 pointer-events-none select-none">
+                {currentChord}
+              </div>
+
+              {activeMeasure.steps.map((step, index) => (
+                <StrumNode
+                  key={step.id}
+                  step={step}
+                  isActive={currentDisplayStepIdx === index}
+                  onClick={() => updateStep(activeMeasureIdx, index, { isHit: !step.isHit })}
+                  onLyricsChange={(text) => updateStep(activeMeasureIdx, index, { lyrics: text })}
+                />
+              ))}
+            </div>
+          </div>
+          <p className="text-center text-slate-500 mt-6 flex items-center justify-center gap-2 text-sm">
+            <Info size={16} />
+            <span className="hidden md:inline">Edit mode:</span> Tap arrow to toggle Hit/Pass. Type below arrow for lyrics.
+          </p>
+        </div>
+
+        {/* Controls */}
+        <Controls
+          isPlaying={isPlaying}
+          bpm={bpm}
+          setBpm={setBpm}
+          onTogglePlay={handleTogglePlay}
+          onReset={() => {
+            setIsPlaying(false);
+            setCurrentDisplayStepIdx(null);
+            currentStepIdxRef.current = 0;
+            currentMeasureIdxRef.current = activeMeasureIdx;
+          }}
+          stepCount={activeMeasure.steps.length}
+          onStepCountChange={changeStepCount}
+        />
+
+      </main>
+
+      <footer className="p-4 text-center text-slate-700 text-sm">
+        StrumMaster v2.0 &bull; Measures & Lyrics
+      </footer>
+    </div>
+  );
+};
+
+export default App;
