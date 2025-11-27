@@ -73,17 +73,22 @@ const App: React.FC = () => {
   };
 
   const addMeasure = () => {
-    const lastMeasure = measures[measures.length - 1];
-    // Copy the entire pattern from the last measure for continuity
+    const currentMeasure = measures[activeMeasureIdx];
+    // Copy the entire pattern from the current measure for continuity
     const newMeasure: Measure = {
       id: `measure-${Date.now()}-${measures.length}`,
-      steps: lastMeasure.steps.map(step => ({
+      steps: currentMeasure.steps.map(step => ({
         ...step,
         id: `step-${Date.now()}-${Math.random()}` // Generate unique IDs for new steps
       }))
     };
-    setMeasures(prev => [...prev, newMeasure]);
-    setActiveMeasureIdx(measures.length); // Jump to new
+    
+    // Insert the new measure after the current measure
+    const newMeasures = [...measures];
+    newMeasures.splice(activeMeasureIdx + 1, 0, newMeasure);
+    
+    setMeasures(newMeasures);
+    setActiveMeasureIdx(activeMeasureIdx + 1); // Jump to the new measure
   };
 
   const removeMeasure = () => {
