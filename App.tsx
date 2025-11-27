@@ -291,7 +291,7 @@ const App: React.FC = () => {
   const currentChord = activeMeasure.steps[0]?.chord || 'Am';
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col font-sans text-slate-100 selection:bg-amber-500/30">
+    <div className="min-h-screen bg-slate-900 flex flex-col font-sans text-slate-100 selection:bg-amber-500/30 w-full overflow-x-hidden">
       
       {/* Header */}
       <header className="bg-slate-950/50 backdrop-blur-md border-b border-white/10 p-4 sticky top-0 z-50">
@@ -315,7 +315,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-start p-4 md:p-8 gap-8 w-full max-w-6xl mx-auto">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 gap-8 w-full">
         
         {/* Measure Navigation & Info */}
         <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-800/50 p-4 rounded-xl border border-white/5">
@@ -394,7 +394,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Visualizer Area */}
-        <div className="w-full overflow-x-auto pb-6 pt-2 custom-scrollbar">
+        <div className="w-full pb-6 pt-2">
           {/* Кнопки управления паттерном */}
           {hasUnsavedChanges && (
             <div className="w-full flex justify-center gap-4 mb-4 animate-pulse">
@@ -420,8 +420,8 @@ const App: React.FC = () => {
             </div>
           )}
           
-          <div className="flex justify-center min-w-max px-4">
-            <div className="relative flex gap-4 md:gap-6 bg-slate-950/40 p-8 pt-10 rounded-3xl border border-white/5 shadow-2xl">
+          <div className="visualizer-container flex justify-center w-full px-4">
+            <div className="strum-container relative flex gap-4 md:gap-6 bg-slate-950/40 p-8 pt-10 rounded-3xl border border-white/5 shadow-2xl items-center justify-center">
               
               {/* Measure Chord Label Background */}
               <div className="absolute top-3 left-4 text-slate-700 font-black text-6xl opacity-10 pointer-events-none select-none">

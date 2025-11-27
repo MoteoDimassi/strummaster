@@ -1,0 +1,40 @@
+/* Дополнительные стили для StrumMaster */
+
+/* Убираем ограничение ширины для всего приложения */
+html, body {
+  width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Убираем ограничение ширины для контейнера со стрелочками */
+.visualizer-container {
+  width: 100% !important;
+  max-width: none !important;
+  overflow-x: visible !important;
+}
+
+/* Стили для внутреннего контейнера со стрелочками */
+.strum-container {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 100% !important;
+  overflow-x: visible !important;
+  justify-content: center !important;
+}
+
+/* Стили для отдельных стрелочек */
+.strum-node {
+  flex-shrink: 0;
+}
+
+/* Обеспечиваем корректное отображение на мобильных устройствах */
+@media (max-width: 768px) {
+  .visualizer-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .strum-container {
+    gap: 0.5rem;
+  }
+}

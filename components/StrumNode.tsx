@@ -28,7 +28,7 @@ export const StrumNode: React.FC<StrumNodeProps> = ({ step, isActive, onClick, o
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 group select-none">
+    <div className="strum-node flex flex-col items-center gap-2 group select-none">
       
       {/* Clickable Arrow Area */}
       <div
