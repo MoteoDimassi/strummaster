@@ -37,6 +37,10 @@ const App: React.FC = () => {
   
   // Modal State
   const [isTunerModalOpen, setIsTunerModalOpen] = useState(false);
+  
+  // Global strum pattern state - для отслеживания изменений, которые должны применяться ко всем тактам
+  const [globalStrumPattern, setGlobalStrumPattern] = useState<StrumStep[]>([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // --- REFS (for Scheduler) ---
   const nextNoteTimeRef = useRef<number>(0);
@@ -70,9 +74,15 @@ const App: React.FC = () => {
 
   const addMeasure = () => {
     const lastMeasure = measures[measures.length - 1];
-    // Copy chord from last measure for continuity
-    const lastChord = lastMeasure.steps[0]?.chord || 'Am';
-    setMeasures(prev => [...prev, createMeasure(prev.length, lastChord)]);
+    // Copy the entire pattern from the last measure for continuity
+    const newMeasure: Measure = {
+      id: `measure-${Date.now()}-${measures.length}`,
+      steps: lastMeasure.steps.map(step => ({
+        ...step,
+        id: `step-${Date.now()}-${Math.random()}` // Generate unique IDs for new steps
+      }))
+    };
+    setMeasures(prev => [...prev, newMeasure]);
     setActiveMeasureIdx(measures.length); // Jump to new
   };
 
@@ -98,6 +108,7 @@ const App: React.FC = () => {
   };
 
   const updateStep = (measureIdx: number, stepIdx: number, updates: Partial<StrumStep>) => {
+    // Обновляем только текущий такт и помечаем наличие несохраненных изменений
     setMeasures(prev => prev.map((m, i) => {
       if (i === measureIdx) {
         const newSteps = [...m.steps];
@@ -106,6 +117,41 @@ const App: React.FC = () => {
       }
       return m;
     }));
+    
+    // Помечаем, что есть несохраненные изменения
+    setHasUnsavedChanges(true);
+  };
+
+  // Функция для применения изменений ко всем тактам
+  const applyToAllMeasures = () => {
+    const currentMeasure = measures[activeMeasureIdx];
+    if (!currentMeasure) return;
+    
+    // Обновляем глобальный паттерн
+    setGlobalStrumPattern([...currentMeasure.steps]);
+    
+    // Применяем паттерн ко всем тактам
+    setMeasures(prev => prev.map(m => ({
+      ...m,
+      steps: m.steps.map((step, idx) => {
+        if (idx < currentMeasure.steps.length) {
+          return {
+            ...step,
+            strumType: currentMeasure.steps[idx].strumType
+          };
+        }
+        return step;
+      })
+    })));
+    
+    // Сбрасываем флаг несохраненных изменений
+    setHasUnsavedChanges(false);
+  };
+
+  // Функция для сохранения изменений только в текущем такте
+  const saveOnlyInThisMeasure = () => {
+    // Просто сбрасываем флаг несохраненных изменений
+    setHasUnsavedChanges(false);
   };
 
   const changeStepCount = (delta: number) => {
@@ -349,6 +395,31 @@ const App: React.FC = () => {
 
         {/* Visualizer Area */}
         <div className="w-full overflow-x-auto pb-6 pt-2 custom-scrollbar">
+          {/* Кнопки управления паттерном */}
+          {hasUnsavedChanges && (
+            <div className="w-full flex justify-center gap-4 mb-4 animate-pulse">
+              <button
+                onClick={applyToAllMeasures}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 12h18m-9-9v18"/>
+                  <path d="M3 6h18M3 18h18"/>
+                </svg>
+                Применить ко всем тактам
+              </button>
+              <button
+                onClick={saveOnlyInThisMeasure}
+                className="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Сохранить только в этом такте
+              </button>
+            </div>
+          )}
+          
           <div className="flex justify-center min-w-max px-4">
             <div className="relative flex gap-4 md:gap-6 bg-slate-950/40 p-8 pt-10 rounded-3xl border border-white/5 shadow-2xl">
               
@@ -377,6 +448,9 @@ const App: React.FC = () => {
           <p className="text-center text-slate-500 mt-6 flex items-center justify-center gap-2 text-sm">
             <Info size={16} />
             <span className="hidden md:inline">Edit mode:</span> Tap arrow to cycle: Strum &rarr; Mute &rarr; Ghost. Type below arrow for lyrics.
+            {hasUnsavedChanges && (
+              <span className="ml-2 text-amber-400 font-medium">Есть несохраненные изменения в паттерне!</span>
+            )}
           </p>
         </div>
 
