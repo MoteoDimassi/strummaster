@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { StrumStep, Measure } from './types';
 import { StrumNode } from './components/StrumNode';
 import { Controls } from './components/Controls';
+import TunerModal from './components/TunerModal';
 import { audioEngine } from './services/audioEngine';
 import { Music, Volume2, Info, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 
@@ -33,6 +34,9 @@ const App: React.FC = () => {
   // Playback State
   // We track the *global* position relative to the current measure during playback
   const [currentDisplayStepIdx, setCurrentDisplayStepIdx] = useState<number | null>(null);
+  
+  // Modal State
+  const [isTunerModalOpen, setIsTunerModalOpen] = useState(false);
 
   // --- REFS (for Scheduler) ---
   const nextNoteTimeRef = useRef<number>(0);
@@ -128,6 +132,15 @@ const App: React.FC = () => {
       }
       return m;
     }));
+  };
+
+  // Функции для управления модальным окном тюнера
+  const openTunerModal = () => {
+    setIsTunerModalOpen(true);
+  };
+
+  const closeTunerModal = () => {
+    setIsTunerModalOpen(false);
   };
 
   // --- SCHEDULING LOGIC ---
@@ -263,7 +276,7 @@ const App: React.FC = () => {
           
           {/* Navigation */}
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={() => handleMeasureChange(-1)}
               disabled={activeMeasureIdx === 0}
               className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-lg transition-colors"
@@ -276,7 +289,7 @@ const App: React.FC = () => {
                 {activeMeasureIdx + 1} <span className="text-slate-500 text-lg">/ {measures.length}</span>
               </span>
             </div>
-            <button 
+            <button
               onClick={() => handleMeasureChange(1)}
               disabled={activeMeasureIdx === measures.length - 1}
               className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-lg transition-colors"
@@ -288,8 +301,8 @@ const App: React.FC = () => {
           {/* Chord Editor */}
           <div className="flex items-center gap-3">
              <label className="text-sm text-slate-400 font-medium">Chord:</label>
-             <select 
-               value={currentChord} 
+             <select
+               value={currentChord}
                onChange={(e) => updateChordForMeasure(e.target.value)}
                className="bg-slate-900 border border-slate-700 text-amber-400 font-bold text-lg rounded-lg px-3 py-1 focus:ring-2 focus:ring-amber-500 outline-none"
              >
@@ -301,14 +314,14 @@ const App: React.FC = () => {
 
           {/* Measure Actions */}
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={addMeasure}
               className="flex items-center gap-1 px-3 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg text-sm font-medium transition-colors border border-emerald-600/30"
             >
               <Plus size={16} /> Add Bar
             </button>
             {measures.length > 1 && (
-              <button 
+              <button
                 onClick={removeMeasure}
                 className="p-2 bg-rose-900/20 hover:bg-rose-900/40 text-rose-400 rounded-lg transition-colors border border-rose-900/30"
                 title="Delete Current Measure"
@@ -317,6 +330,21 @@ const App: React.FC = () => {
               </button>
             )}
           </div>
+        </div>
+
+        {/* Tuner Button */}
+        <div className="w-full flex justify-end">
+          <button
+            onClick={openTunerModal}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Тюнер
+          </button>
         </div>
 
         {/* Visualizer Area */}
@@ -373,6 +401,12 @@ const App: React.FC = () => {
       <footer className="p-4 text-center text-slate-700 text-sm">
         StrumMaster v2.0 &bull; Measures & Lyrics
       </footer>
+
+      {/* Tuner Modal */}
+      <TunerModal
+        isOpen={isTunerModalOpen}
+        onClose={closeTunerModal}
+      />
     </div>
   );
 };
