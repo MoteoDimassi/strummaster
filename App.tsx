@@ -135,19 +135,41 @@ const App: React.FC = () => {
     // Обновляем глобальный паттерн
     setGlobalStrumPattern([...currentMeasure.steps]);
     
-    // Применяем паттерн ко всем тактам
-    setMeasures(prev => prev.map(m => ({
-      ...m,
-      steps: m.steps.map((step, idx) => {
-        if (idx < currentMeasure.steps.length) {
-          return {
-            ...step,
-            strumType: currentMeasure.steps[idx].strumType
-          };
+    // Применяем все изменения из текущего такта ко всем тактам
+    setMeasures(prev => prev.map(m => {
+      const currentChord = m.steps[0]?.chord || 'Am';
+      let newSteps = [];
+      
+      // Сначала создаем нужное количество шагов
+      if (currentMeasure.steps.length > m.steps.length) {
+        // Если нужно добавить шаги
+        newSteps = [...m.steps];
+        const stepsToAdd = currentMeasure.steps.length - m.steps.length;
+        for (let i = 0; i < stepsToAdd; i++) {
+          newSteps.push({
+            id: `step-added-${Date.now()}-${i}`,
+            direction: (m.steps.length + i) % 2 === 0 ? 'down' : 'up' as any,
+            strumType: 'ghost',
+            chord: currentChord,
+            lyrics: ''
+          });
         }
-        return step;
-      })
-    })));
+      } else {
+        // Если нужно уменьшить количество шагов или оставить как есть
+        newSteps = m.steps.slice(0, currentMeasure.steps.length);
+      }
+      
+      // Затем применяем состояния из текущего такта к каждому шагу
+      newSteps = newSteps.map((step, idx) => ({
+        ...step,
+        strumType: currentMeasure.steps[idx].strumType
+      }));
+      
+      return {
+        ...m,
+        steps: newSteps
+      };
+    }));
     
     // Сбрасываем флаг несохраненных изменений
     setHasUnsavedChanges(false);
@@ -166,6 +188,9 @@ const App: React.FC = () => {
         const newLen = Math.max(4, Math.min(16, currentLen + delta));
         const currentChord = m.steps[0]?.chord || 'Am';
         
+        // Если количество шагов не изменилось, ничего не делаем
+        if (newLen === currentLen) return m;
+        
         let newSteps = [...m.steps];
         if (newLen > currentLen) {
           const added = Array.from({ length: newLen - currentLen }, (_, k) => ({
@@ -179,6 +204,10 @@ const App: React.FC = () => {
         } else {
           newSteps = newSteps.slice(0, newLen);
         }
+        
+        // Помечаем, что есть несохраненные изменения
+        setHasUnsavedChanges(true);
+        
         return { ...m, steps: newSteps };
       }
       return m;
@@ -454,7 +483,7 @@ const App: React.FC = () => {
             <Info size={16} />
             <span className="hidden md:inline">Edit mode:</span> Tap arrow to cycle: Strum &rarr; Mute &rarr; Ghost. Type below arrow for lyrics.
             {hasUnsavedChanges && (
-              <span className="ml-2 text-amber-400 font-medium">Есть несохраненные изменения в паттерне!</span>
+              <span className="ml-2 text-amber-400 font-medium">Есть несохраненные изменения в такте!</span>
             )}
           </p>
         </div>
