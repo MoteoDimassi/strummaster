@@ -1,6 +1,6 @@
 import React from 'react';
 import { Info } from 'lucide-react';
-import { StrumNode } from '../../../../components/StrumNode';
+import { StrumNode } from '../../../shared/components/StrumNode';
 import { useAppSelector, useAppDispatch } from '../../../store/hooks';
 import { updateStep } from '../../../store/slices/playerSlice';
 

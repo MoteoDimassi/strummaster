@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowDown, ArrowUp, Circle, CircleDot, X } from 'lucide-react';
-import { StrumStep } from '../types';
+import { StrumStep } from '../../domain/entities/StrumStep';
 
 interface StrumNodeProps {
   step: StrumStep;
