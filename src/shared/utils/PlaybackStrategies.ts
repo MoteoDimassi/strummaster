@@ -14,7 +14,7 @@ export interface PlaybackStrategy {
 }
 
 export class BasicStrumStrategy implements PlaybackStrategy {
-  private readonly staggerTime = 0.025; // 25ms delay between strings
+  private readonly staggerTime = 0.01; // 10ms delay between strings
 
   async play(
     samples: AudioSample[],
@@ -71,7 +71,7 @@ export class BasicStrumStrategy implements PlaybackStrategy {
 }
 
 export class AggressiveStrumStrategy implements PlaybackStrategy {
-  private readonly staggerTime = 0.015; // Faster stagger for aggressive sound
+  private readonly staggerTime = 0.008; // Faster stagger for aggressive sound
   private readonly gainMultiplier = 1.2;
 
   async play(
@@ -135,7 +135,7 @@ export class AggressiveStrumStrategy implements PlaybackStrategy {
 }
 
 export class GentleStrumStrategy implements PlaybackStrategy {
-  private readonly staggerTime = 0.035; // Slower stagger for gentle sound
+  private readonly staggerTime = 0.015; // Slower stagger for gentle sound
   private readonly gainMultiplier = 0.8;
 
   async play(
