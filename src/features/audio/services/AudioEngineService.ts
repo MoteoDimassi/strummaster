@@ -102,9 +102,9 @@ export class AudioEngineService {
   }
 
   public async strum(
-    direction: StrumDirection, 
-    chordName: string, 
-    type: StrumType, 
+    direction: StrumDirection,
+    chordName: string,
+    type: StrumType,
     time?: number
   ): Promise<void> {
     this.init();
@@ -115,6 +115,9 @@ export class AudioEngineService {
       audioEventBus.emitSync('step', { type: 'ghost', chord: chordName });
       return;
     }
+
+    // Глушим предыдущие звуки перед воспроизведением новых
+    this.stopPreviousSounds();
 
     const startTime = time || this.ctx.currentTime;
 
@@ -161,6 +164,9 @@ export class AudioEngineService {
   public async playNote(stringName: string, fret: number, time?: number): Promise<void> {
     this.init();
     if (!this.ctx || !this.masterGain) return;
+
+    // Глушим предыдущие звуки перед воспроизведением новых
+    this.stopPreviousSounds();
 
     const startTime = time || this.ctx.currentTime;
 
@@ -209,6 +215,20 @@ export class AudioEngineService {
   public stopAllSounds(): void {
     if (!this.ctx || !this.masterGain) return;
     
+    // Останавливаем все активные источники звука
+    this.activeSources.forEach(source => {
+      try {
+        source.stop();
+      } catch (e) {
+        // Источник может быть уже остановлен, игнорируем ошибку
+      }
+    });
+    this.activeSources = [];
+  }
+
+  private stopPreviousSounds(): void {
+    if (!this.ctx || !this.masterGain) return;
+    
     // Мгновенно глушим все звуки через master gain
     this.masterGain.gain.setValueAtTime(0, this.ctx.currentTime);
     
@@ -221,6 +241,9 @@ export class AudioEngineService {
       }
     });
     this.activeSources = [];
+    
+    // Восстанавливаем громкость для следующего воспроизведения
+    this.masterGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
   }
 
   public stop(): void {
