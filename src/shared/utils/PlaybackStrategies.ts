@@ -11,10 +11,18 @@ export interface PlaybackStrategy {
     time?: number,
     sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void>;
+  
+  // Возвращает время затухания для данной стратегии
+  getFadeOutTime(): number;
+  
+  // Возвращает время появления новых звуков
+  getFadeInTime(): number;
 }
 
 export class BasicStrumStrategy implements PlaybackStrategy {
   private readonly staggerTime = 0.01; // 10ms delay between strings
+  private readonly fadeOutTime = 0.05; // 50ms fade out time
+  private readonly fadeInTime = 0.02; // 20ms fade in time
 
   async play(
     samples: AudioSample[],
@@ -56,7 +64,9 @@ export class BasicStrumStrategy implements PlaybackStrategy {
     source.buffer = sample.buffer;
 
     const gain = audioContext.createGain();
-    gain.gain.value = 1.0;
+    // Начинаем с минимальной громкости и плавно увеличиваем
+    gain.gain.setValueAtTime(0.001, time);
+    gain.gain.exponentialRampToValueAtTime(1.0, time + this.fadeInTime);
 
     source.connect(gain);
     gain.connect(destination);
@@ -67,12 +77,22 @@ export class BasicStrumStrategy implements PlaybackStrategy {
     }
 
     source.start(time);
+  }
+  
+  getFadeOutTime(): number {
+    return this.fadeOutTime;
+  }
+  
+  getFadeInTime(): number {
+    return this.fadeInTime;
   }
 }
 
 export class AggressiveStrumStrategy implements PlaybackStrategy {
   private readonly staggerTime = 0.008; // Faster stagger for aggressive sound
   private readonly gainMultiplier = 1.2;
+  private readonly fadeOutTime = 0.03; // 30ms fade out time (faster)
+  private readonly fadeInTime = 0.01; // 10ms fade in time (faster)
 
   async play(
     samples: AudioSample[],
@@ -120,7 +140,9 @@ export class AggressiveStrumStrategy implements PlaybackStrategy {
     source.buffer = sample.buffer;
 
     const gain = audioContext.createGain();
-    gain.gain.value = gainMultiplier;
+    // Начинаем с минимальной громкости и плавно увеличиваем до нужного значения
+    gain.gain.setValueAtTime(0.001, time);
+    gain.gain.exponentialRampToValueAtTime(gainMultiplier, time + this.fadeInTime);
 
     source.connect(gain);
     gain.connect(destination);
@@ -131,12 +153,22 @@ export class AggressiveStrumStrategy implements PlaybackStrategy {
     }
 
     source.start(time);
+  }
+  
+  getFadeOutTime(): number {
+    return this.fadeOutTime;
+  }
+  
+  getFadeInTime(): number {
+    return this.fadeInTime;
   }
 }
 
 export class GentleStrumStrategy implements PlaybackStrategy {
   private readonly staggerTime = 0.015; // Slower stagger for gentle sound
   private readonly gainMultiplier = 0.8;
+  private readonly fadeOutTime = 0.07; // 70ms fade out time (slower)
+  private readonly fadeInTime = 0.03; // 30ms fade in time (slower)
 
   async play(
     samples: AudioSample[],
@@ -184,7 +216,9 @@ export class GentleStrumStrategy implements PlaybackStrategy {
     source.buffer = sample.buffer;
 
     const gain = audioContext.createGain();
-    gain.gain.value = gainMultiplier;
+    // Начинаем с минимальной громкости и плавно увеличиваем до нужного значения
+    gain.gain.setValueAtTime(0.001, time);
+    gain.gain.exponentialRampToValueAtTime(gainMultiplier, time + this.fadeInTime);
 
     source.connect(gain);
     gain.connect(destination);
@@ -196,9 +230,19 @@ export class GentleStrumStrategy implements PlaybackStrategy {
 
     source.start(time);
   }
+  
+  getFadeOutTime(): number {
+    return this.fadeOutTime;
+  }
+  
+  getFadeInTime(): number {
+    return this.fadeInTime;
+  }
 }
 
 export class MuteStrategy implements PlaybackStrategy {
+  private readonly fadeOutTime = 0.05; // 50ms fade out time
+  private readonly fadeInTime = 0.02; // 20ms fade in time
   async play(
     samples: AudioSample[],
     direction: StrumDirection,
@@ -222,7 +266,9 @@ export class MuteStrategy implements PlaybackStrategy {
     source.buffer = muteSample.buffer;
 
     const gain = audioContext.createGain();
-    gain.gain.value = 0.8;
+    // Начинаем с минимальной громкости и плавно увеличиваем
+    gain.gain.setValueAtTime(0.001, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.8, startTime + this.fadeInTime);
 
     source.connect(gain);
     gain.connect(destination);
@@ -233,6 +279,14 @@ export class MuteStrategy implements PlaybackStrategy {
     }
 
     source.start(startTime);
+  }
+  
+  getFadeOutTime(): number {
+    return this.fadeOutTime;
+  }
+  
+  getFadeInTime(): number {
+    return this.fadeInTime;
   }
 }
 

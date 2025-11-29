@@ -116,8 +116,12 @@ export class AudioEngineService {
       return;
     }
 
-    // Глушим предыдущие звуки перед воспроизведением новых
-    this.stopPreviousSounds();
+    // Глушим предыдущие звуки перед воспроизведением новых с использованием времени затухания из стратегии
+    const strategy = type === 'mute'
+      ? PlaybackStrategyFactory.getMuteStrategy()
+      : PlaybackStrategyFactory.getStrategy(this.playbackStrategy);
+    
+    this.stopPreviousSounds(strategy.getFadeOutTime());
 
     const startTime = time || this.ctx.currentTime;
 
@@ -125,7 +129,6 @@ export class AudioEngineService {
       // Handle Mute Strum
       if (type === 'mute') {
         const muteSample = await audioSampleFactory.preloadMuteSample();
-        const strategy = PlaybackStrategyFactory.getMuteStrategy();
         await strategy.play([muteSample], direction, type, this.ctx, this.masterGain, startTime, this.registerActiveSource.bind(this));
         
         audioEventBus.emitSync('step', { type: 'mute', chord: chordName });
@@ -140,7 +143,9 @@ export class AudioEngineService {
       }
 
       const chordSample = await audioSampleFactory.loadChordSamples(chordName, frets);
-      const strategy = PlaybackStrategyFactory.getStrategy(this.playbackStrategy);
+      
+      // Применяем плавное появление новых звуков
+      this.applyFadeIn(strategy.getFadeInTime());
       
       await strategy.play(chordSample.samples, direction, type, this.ctx, this.masterGain, startTime, this.registerActiveSource.bind(this));
       
@@ -166,7 +171,8 @@ export class AudioEngineService {
     if (!this.ctx || !this.masterGain) return;
 
     // Глушим предыдущие звуки перед воспроизведением новых
-    this.stopPreviousSounds();
+    const strategy = PlaybackStrategyFactory.getStrategy(this.playbackStrategy);
+    this.stopPreviousSounds(strategy.getFadeOutTime());
 
     const startTime = time || this.ctx.currentTime;
 
@@ -181,6 +187,10 @@ export class AudioEngineService {
       }
 
       const strategy = PlaybackStrategyFactory.getStrategy(this.playbackStrategy);
+      
+      // Применяем плавное появление новых звуков
+      this.applyFadeIn(strategy.getFadeInTime());
+      
       await strategy.play([sample], 'down', 'strum', this.ctx, this.masterGain, startTime, this.registerActiveSource.bind(this));
       
       audioEventBus.emitSync('play', { 
@@ -226,16 +236,19 @@ export class AudioEngineService {
     this.activeSources = [];
   }
 
-  private stopPreviousSounds(): void {
+  private stopPreviousSounds(fadeOutTime?: number): void {
     if (!this.ctx || !this.masterGain) return;
     
-    // Мгновенно глушим все звуки через master gain
-    this.masterGain.gain.setValueAtTime(0, this.ctx.currentTime);
+    // Используем время затухания в зависимости от стратегии воспроизведения
+    const fadeDuration = fadeOutTime ?? this.getFadeOutTime();
     
-    // Останавливаем все активные источники звука
+    // Плавно глушим все звуки через master gain
+    this.masterGain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + fadeDuration);
+    
+    // Останавливаем все активные источники звука с задержкой
     this.activeSources.forEach(source => {
       try {
-        source.stop();
+        source.stop(this.ctx!.currentTime + fadeDuration);
       } catch (e) {
         // Источник может быть уже остановлен, игнорируем ошибку
       }
@@ -243,7 +256,27 @@ export class AudioEngineService {
     this.activeSources = [];
     
     // Восстанавливаем громкость для следующего воспроизведения
-    this.masterGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+    this.masterGain.gain.setValueAtTime(0.5, this.ctx.currentTime + fadeDuration);
+  }
+  
+  private applyFadeIn(fadeInTime: number): void {
+    if (!this.ctx || !this.masterGain) return;
+    
+    // Начинаем с минимальной громкости и плавно увеличиваем
+    this.masterGain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+    this.masterGain.gain.exponentialRampToValueAtTime(0.5, this.ctx.currentTime + fadeInTime);
+  }
+
+  private getFadeOutTime(): number {
+    // Возвращаем время затухания в зависимости от стратегии воспроизведения
+    switch (this.playbackStrategy) {
+      case 'aggressive':
+        return 0.03; // 30мс для агрессивного стиля
+      case 'gentle':
+        return 0.07; // 70мс для мягкого стиля
+      default:
+        return 0.05; // 50мс для базового стиля
+    }
   }
 
   public stop(): void {
