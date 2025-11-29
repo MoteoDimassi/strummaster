@@ -86,6 +86,9 @@ export class PlayerService {
       this.timerID = null;
     }
     
+    // Глушим все активные звуки
+    audioEngineService.stopAllSounds();
+    
     audioEventBus.emitSync('stop');
   }
 

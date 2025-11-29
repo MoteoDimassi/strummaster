@@ -8,7 +8,8 @@ export interface PlaybackStrategy {
     type: StrumType,
     audioContext: AudioContext,
     destination: AudioNode,
-    time?: number
+    time?: number,
+    sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void>;
 }
 
@@ -21,19 +22,20 @@ export class BasicStrumStrategy implements PlaybackStrategy {
     type: StrumType,
     audioContext: AudioContext,
     destination: AudioNode,
-    time?: number
+    time?: number,
+    sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void> {
     if (type === 'ghost') return;
 
     const startTime = time || audioContext.currentTime;
 
     // Order samples based on strum direction
-    const orderedSamples = direction === 'down' 
-      ? samples 
+    const orderedSamples = direction === 'down'
+      ? samples
       : [...samples].reverse();
 
-    const playPromises = orderedSamples.map((sample, index) => 
-      this.playSample(sample, startTime + (index * this.staggerTime), audioContext, destination)
+    const playPromises = orderedSamples.map((sample, index) =>
+      this.playSample(sample, startTime + (index * this.staggerTime), audioContext, destination, sourceCallback)
     );
 
     await Promise.all(playPromises);
@@ -43,7 +45,8 @@ export class BasicStrumStrategy implements PlaybackStrategy {
     sample: AudioSample,
     time: number,
     audioContext: AudioContext,
-    destination: AudioNode
+    destination: AudioNode,
+    sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void> {
     if (!sample.buffer) {
       throw new Error(`Sample ${sample.id} not loaded`);
@@ -57,6 +60,11 @@ export class BasicStrumStrategy implements PlaybackStrategy {
 
     source.connect(gain);
     gain.connect(destination);
+
+    // Регистрируем источник, если предоставлен колбэк
+    if (sourceCallback) {
+      sourceCallback(source);
+    }
 
     source.start(time);
   }
@@ -72,22 +80,24 @@ export class AggressiveStrumStrategy implements PlaybackStrategy {
     type: StrumType,
     audioContext: AudioContext,
     destination: AudioNode,
-    time?: number
+    time?: number,
+    sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void> {
     if (type === 'ghost') return;
 
     const startTime = time || audioContext.currentTime;
-    const orderedSamples = direction === 'down' 
-      ? samples 
+    const orderedSamples = direction === 'down'
+      ? samples
       : [...samples].reverse();
 
-    const playPromises = orderedSamples.map((sample, index) => 
+    const playPromises = orderedSamples.map((sample, index) =>
       this.playSample(
-        sample, 
-        startTime + (index * this.staggerTime), 
-        audioContext, 
+        sample,
+        startTime + (index * this.staggerTime),
+        audioContext,
         destination,
-        this.gainMultiplier
+        this.gainMultiplier,
+        sourceCallback
       )
     );
 
@@ -99,7 +109,8 @@ export class AggressiveStrumStrategy implements PlaybackStrategy {
     time: number,
     audioContext: AudioContext,
     destination: AudioNode,
-    gainMultiplier: number = 1.0
+    gainMultiplier: number = 1.0,
+    sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void> {
     if (!sample.buffer) {
       throw new Error(`Sample ${sample.id} not loaded`);
@@ -113,6 +124,11 @@ export class AggressiveStrumStrategy implements PlaybackStrategy {
 
     source.connect(gain);
     gain.connect(destination);
+
+    // Регистрируем источник, если предоставлен колбэк
+    if (sourceCallback) {
+      sourceCallback(source);
+    }
 
     source.start(time);
   }
@@ -128,22 +144,24 @@ export class GentleStrumStrategy implements PlaybackStrategy {
     type: StrumType,
     audioContext: AudioContext,
     destination: AudioNode,
-    time?: number
+    time?: number,
+    sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void> {
     if (type === 'ghost') return;
 
     const startTime = time || audioContext.currentTime;
-    const orderedSamples = direction === 'down' 
-      ? samples 
+    const orderedSamples = direction === 'down'
+      ? samples
       : [...samples].reverse();
 
-    const playPromises = orderedSamples.map((sample, index) => 
+    const playPromises = orderedSamples.map((sample, index) =>
       this.playSample(
-        sample, 
-        startTime + (index * this.staggerTime), 
-        audioContext, 
+        sample,
+        startTime + (index * this.staggerTime),
+        audioContext,
         destination,
-        this.gainMultiplier
+        this.gainMultiplier,
+        sourceCallback
       )
     );
 
@@ -155,7 +173,8 @@ export class GentleStrumStrategy implements PlaybackStrategy {
     time: number,
     audioContext: AudioContext,
     destination: AudioNode,
-    gainMultiplier: number = 1.0
+    gainMultiplier: number = 1.0,
+    sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void> {
     if (!sample.buffer) {
       throw new Error(`Sample ${sample.id} not loaded`);
@@ -170,6 +189,11 @@ export class GentleStrumStrategy implements PlaybackStrategy {
     source.connect(gain);
     gain.connect(destination);
 
+    // Регистрируем источник, если предоставлен колбэк
+    if (sourceCallback) {
+      sourceCallback(source);
+    }
+
     source.start(time);
   }
 }
@@ -181,7 +205,8 @@ export class MuteStrategy implements PlaybackStrategy {
     type: StrumType,
     audioContext: AudioContext,
     destination: AudioNode,
-    time?: number
+    time?: number,
+    sourceCallback?: (source: AudioBufferSourceNode) => void
   ): Promise<void> {
     if (type !== 'mute') return;
 
@@ -201,6 +226,11 @@ export class MuteStrategy implements PlaybackStrategy {
 
     source.connect(gain);
     gain.connect(destination);
+
+    // Регистрируем источник, если предоставлен колбэк
+    if (sourceCallback) {
+      sourceCallback(source);
+    }
 
     source.start(startTime);
   }

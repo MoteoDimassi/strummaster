@@ -28,6 +28,7 @@ export class AudioEngineService {
   private masterGain: GainNode | null = null;
   private playbackStrategy: PlaybackStrategyType = 'basic';
   private isInitialized = false;
+  private activeSources: AudioBufferSourceNode[] = [];
 
   constructor() {
     // Lazy initialization
@@ -62,6 +63,11 @@ export class AudioEngineService {
     if (this.ctx && this.ctx.state === 'suspended') {
       await this.ctx.resume();
       audioEventBus.emitSync('resume');
+    }
+    
+    // Восстанавливаем громкость после возможного глушения
+    if (this.masterGain) {
+      this.masterGain.gain.setValueAtTime(0.5, this.ctx!.currentTime);
     }
   }
 
@@ -117,7 +123,7 @@ export class AudioEngineService {
       if (type === 'mute') {
         const muteSample = await audioSampleFactory.preloadMuteSample();
         const strategy = PlaybackStrategyFactory.getMuteStrategy();
-        await strategy.play([muteSample], direction, type, this.ctx, this.masterGain, startTime);
+        await strategy.play([muteSample], direction, type, this.ctx, this.masterGain, startTime, this.registerActiveSource.bind(this));
         
         audioEventBus.emitSync('step', { type: 'mute', chord: chordName });
         return;
@@ -133,7 +139,7 @@ export class AudioEngineService {
       const chordSample = await audioSampleFactory.loadChordSamples(chordName, frets);
       const strategy = PlaybackStrategyFactory.getStrategy(this.playbackStrategy);
       
-      await strategy.play(chordSample.samples, direction, type, this.ctx, this.masterGain, startTime);
+      await strategy.play(chordSample.samples, direction, type, this.ctx, this.masterGain, startTime, this.registerActiveSource.bind(this));
       
       audioEventBus.emitSync('step', { 
         type: 'strum', 
@@ -169,7 +175,7 @@ export class AudioEngineService {
       }
 
       const strategy = PlaybackStrategyFactory.getStrategy(this.playbackStrategy);
-      await strategy.play([sample], 'down', 'strum', this.ctx, this.masterGain, startTime);
+      await strategy.play([sample], 'down', 'strum', this.ctx, this.masterGain, startTime, this.registerActiveSource.bind(this));
       
       audioEventBus.emitSync('play', { 
         type: 'note', 
@@ -188,7 +194,38 @@ export class AudioEngineService {
     }
   }
 
+  public registerActiveSource(source: AudioBufferSourceNode): void {
+    this.activeSources.push(source);
+    
+    // Автоматически удаляем источник из списка при остановке
+    source.onended = () => {
+      const index = this.activeSources.indexOf(source);
+      if (index > -1) {
+        this.activeSources.splice(index, 1);
+      }
+    };
+  }
+
+  public stopAllSounds(): void {
+    if (!this.ctx || !this.masterGain) return;
+    
+    // Мгновенно глушим все звуки через master gain
+    this.masterGain.gain.setValueAtTime(0, this.ctx.currentTime);
+    
+    // Останавливаем все активные источники звука
+    this.activeSources.forEach(source => {
+      try {
+        source.stop();
+      } catch (e) {
+        // Источник может быть уже остановлен, игнорируем ошибку
+      }
+    });
+    this.activeSources = [];
+  }
+
   public stop(): void {
+    this.stopAllSounds();
+    
     if (this.ctx) {
       this.ctx.close();
       this.ctx = null;

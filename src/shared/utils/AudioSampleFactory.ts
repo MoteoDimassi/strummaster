@@ -39,6 +39,9 @@ class AudioSampleFactory {
   }
 
   private getSampleUrl(stringName: string, fret: number): string {
+    if (stringName === 'mute') {
+      return `/samples/Mute.mp3`;
+    }
     return `/samples/${stringName}/fret${fret}.mp3`;
   }
 
@@ -48,22 +51,27 @@ class AudioSampleFactory {
 
   async loadSample(config: AudioSampleConfig): Promise<AudioSample> {
     const key = this.getSampleKey(config);
+    console.log(`Loading sample with key: ${key}`);
     
     // Return from cache if already loaded
     if (this.cache.has(key)) {
+      console.log(`Sample ${key} found in cache`);
       return this.cache.get(key)!;
     }
 
     // Return existing promise if already loading
     if (this.loadingPromises.has(key)) {
+      console.log(`Sample ${key} already loading, waiting...`);
       const buffer = await this.loadingPromises.get(key)!;
       return this.cache.get(key)!;
     }
 
     // Create new sample entry
+    const url = this.getSampleUrl(config.stringName, config.fret);
+    console.log(`Loading sample from URL: ${url}`);
     const sample: AudioSample = {
       id: key,
-      url: this.getSampleUrl(config.stringName, config.fret),
+      url: url,
       isLoading: true
     };
     
@@ -78,8 +86,10 @@ class AudioSampleFactory {
       sample.buffer = buffer;
       sample.isLoading = false;
       this.loadingPromises.delete(key);
+      console.log(`Sample ${key} loaded successfully`);
       return sample;
     } catch (error) {
+      console.error(`Failed to load sample ${key}:`, error);
       sample.error = error instanceof Error ? error.message : 'Unknown error';
       sample.isLoading = false;
       this.loadingPromises.delete(key);
@@ -92,13 +102,17 @@ class AudioSampleFactory {
       throw new Error('AudioContext not initialized');
     }
 
+    console.log(`Fetching audio from: ${url}`);
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch audio: ${response.statusText}`);
     }
     
+    console.log(`Audio fetched successfully, decoding...`);
     const arrayBuffer = await response.arrayBuffer();
-    return await this.audioContext.decodeAudioData(arrayBuffer);
+    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    console.log(`Audio decoded successfully`);
+    return audioBuffer;
   }
 
   async loadChordSamples(chordName: string, chordFrets: (number | null)[]): Promise<ChordSample> {
@@ -137,6 +151,7 @@ class AudioSampleFactory {
   }
 
   preloadMuteSample(): Promise<AudioSample> {
+    console.log('Preloading mute sample...');
     return this.loadSample({
       stringName: 'mute',
       fret: 0
