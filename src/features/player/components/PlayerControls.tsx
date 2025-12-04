@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Square, RotateCcw } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../../store/hooks';
-import { 
-  setBpm, 
-  setIsPlaying, 
+import {
+  setBpm,
+  setIsPlaying,
+  setActiveMeasureIdx,
+  setCurrentDisplayStepIdx,
   reset as resetPlayer,
-  changeStepCount 
+  changeStepCount
 } from '../../../store/slices/playerSlice';
 import { playerService } from '../services/PlayerService';
 import { audioEngineService } from '../../audio/services/AudioEngineService';
@@ -25,13 +27,39 @@ export const PlayerControls: React.FC = () => {
     playerService.setConfig({ bpm });
   }, [measures, activeMeasureIdx, bpm]);
 
+  // Subscribe to player service events
+  useEffect(() => {
+    const unsubscribeStep = playerService.onStep((data) => {
+      // Обновляем текущий шаг для анимации
+      dispatch(setCurrentDisplayStepIdx(data.stepIndex));
+    });
+
+    const unsubscribePlay = playerService.onPlay((data) => {
+      // Обновляем состояние Redux при начале воспроизведения
+      dispatch(setIsPlaying(data.isPlaying));
+      dispatch(setActiveMeasureIdx(data.measureIdx));
+    });
+
+    const unsubscribeStop = playerService.onStop((data) => {
+      // Обновляем состояние Redux при остановке
+      dispatch(setIsPlaying(data.isPlaying));
+      dispatch(setActiveMeasureIdx(data.measureIdx));
+      // Сбрасываем отображаемый шаг при остановке
+      dispatch(setCurrentDisplayStepIdx(null));
+    });
+
+    return () => {
+      unsubscribeStep();
+      unsubscribePlay();
+      unsubscribeStop();
+    };
+  }, [dispatch]);
+
   const handleTogglePlay = async () => {
     if (isPlaying) {
       playerService.stop();
-      dispatch(setIsPlaying(false));
     } else {
       await playerService.start();
-      dispatch(setIsPlaying(true));
     }
   };
 

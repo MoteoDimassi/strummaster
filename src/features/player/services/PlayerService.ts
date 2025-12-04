@@ -1,6 +1,4 @@
 import { Measure, StrumStep } from '../../../domain/entities';
-import { audioEngineService } from '../../audio/services/AudioEngineService';
-import { audioEventBus } from '../../../shared/utils/AudioEventBus';
 
 export interface SchedulerConfig {
   bpm: number;
@@ -9,37 +7,16 @@ export interface SchedulerConfig {
 }
 
 export class PlayerService {
-  private isPlaying = false;
-  private nextNoteTime = 0;
-  private currentMeasureIdx = 0;
-  private currentStepIdx = 0;
-  private timerID: number | null = null;
   private measures: Measure[] = [];
-  private activeMeasureIdx = 0;
-  private config: SchedulerConfig = {
-    bpm: 90,
-    lookahead: 25.0,
+  private activeMeasureIdx: number = 0;
+  private config: Partial<SchedulerConfig> = {
+    bpm: 120,
+    lookahead: 0.1,
     scheduleAheadTime: 0.1
   };
-
-  constructor() {
-    this.setupEventListeners();
-  }
-
-  private setupEventListeners(): void {
-    audioEventBus.subscribe('play', (event) => {
-      console.log('Audio play event:', event);
-    });
-
-    audioEventBus.subscribe('stop', (event) => {
-      console.log('Audio stop event:', event);
-      this.stop();
-    });
-
-    audioEventBus.subscribe('error', (event) => {
-      console.error('Audio error event:', event);
-    });
-  }
+  private isPlaying: boolean = false;
+  private timerId: any = null;
+  private currentStep: number = 0;
 
   public setMeasures(measures: Measure[]): void {
     this.measures = measures;
@@ -47,10 +24,6 @@ export class PlayerService {
 
   public setActiveMeasureIdx(idx: number): void {
     this.activeMeasureIdx = idx;
-    if (!this.isPlaying) {
-      this.currentMeasureIdx = idx;
-      this.currentStepIdx = 0;
-    }
   }
 
   public setConfig(config: Partial<SchedulerConfig>): void {
@@ -59,143 +32,188 @@ export class PlayerService {
 
   public async start(): Promise<void> {
     if (this.isPlaying) return;
-
-    await audioEngineService.resume();
+    
     this.isPlaying = true;
+    this.currentStep = 0;
     
-    // Start from the beginning of the CURRENT measure
-    this.currentMeasureIdx = this.activeMeasureIdx;
-    this.currentStepIdx = 0;
-    this.nextNoteTime = audioEngineService.currentTime + 0.1;
+    // Эмитируем событие начала воспроизведения
+    this.emitPlayEvent();
     
-    this.scheduler();
+    // Импортируем AudioEngineService динамически, чтобы избежать циклических зависимостей
+    const { audioEngineService } = await import('../../audio/services/AudioEngineService');
     
-    audioEventBus.emitSync('play', { 
-      measureIdx: this.currentMeasureIdx, 
-      stepIdx: this.currentStepIdx 
-    });
+    const activeMeasure = this.measures[this.activeMeasureIdx];
+    if (!activeMeasure) return;
+    
+    const steps = activeMeasure.steps;
+    const stepDuration = 60 / (this.config.bpm! * 2); // 8th notes
+    
+    const playNextStep = async () => {
+      if (!this.isPlaying || this.currentStep >= steps.length) {
+        // Переходим к следующему такту, если есть
+        if (this.currentStep >= steps.length && this.activeMeasureIdx < this.measures.length - 1) {
+          this.activeMeasureIdx++;
+          this.currentStep = 0;
+          // Рекурсивно запускаем воспроизведение следующего такта
+          this.start();
+          return;
+        }
+        this.stop();
+        return;
+      }
+      
+      const step = steps[this.currentStep];
+      
+      // Эмитируем событие шага для анимации
+      this.emitStepEvent(this.currentStep, step);
+      
+      if (step && step.chord) {
+        await audioEngineService.strum(
+          step.direction,
+          step.chord,
+          step.strumType,
+          undefined
+        );
+      }
+      
+      this.currentStep++;
+      
+      if (this.currentStep < steps.length) {
+        this.timerId = setTimeout(playNextStep, stepDuration * 1000);
+      } else {
+        // Переходим к следующему такту, если есть
+        if (this.activeMeasureIdx < this.measures.length - 1) {
+          this.activeMeasureIdx++;
+          this.currentStep = 0;
+          // Рекурсивно запускаем воспроизведение следующего такта
+          setTimeout(() => this.start(), 100); // Небольшая задержка перед следующим тактом
+        } else {
+          this.stop();
+        }
+      }
+    };
+    
+    // Начинаем воспроизведение
+    await audioEngineService.resume();
+    playNextStep();
   }
 
   public stop(): void {
     if (!this.isPlaying) return;
-
+    
     this.isPlaying = false;
     
-    if (this.timerID) {
-      window.clearTimeout(this.timerID);
-      this.timerID = null;
+    if (this.timerId) {
+      clearTimeout(this.timerId);
+      this.timerId = null;
     }
     
-    // Глушим все активные звуки
-    audioEngineService.stopAllSounds();
-    
-    audioEventBus.emitSync('stop');
+    // Эмитируем событие остановки
+    this.emitStopEvent();
   }
 
   public reset(): void {
     this.stop();
-    this.currentMeasureIdx = this.activeMeasureIdx;
-    this.currentStepIdx = 0;
+    this.activeMeasureIdx = 0;
   }
-
-  private nextNote(): void {
-    const secondsPerBeat = 60.0 / this.config.bpm;
-    const secondsPerEighth = secondsPerBeat / 2;
-    this.nextNoteTime += secondsPerEighth;
-    
-    // Advance logic
-    const currentMeasure = this.measures[this.currentMeasureIdx];
-    if (!currentMeasure) return;
-    
-    this.currentStepIdx += 1;
-
-    // Check if end of measure
-    if (this.currentStepIdx >= currentMeasure.steps.length) {
-      this.currentStepIdx = 0;
-      this.currentMeasureIdx += 1;
-      
-      // Loop song
-      if (this.currentMeasureIdx >= this.measures.length) {
-        this.currentMeasureIdx = 0;
-      }
-    }
-  }
-
-  private async scheduleNote(measureIdx: number, stepIdx: number, time: number): Promise<void> {
-    const measure = this.measures[measureIdx];
-    if (!measure) return;
-    
-    const step = measure.steps[stepIdx];
-    if (!step) return;
-
-    // 1. Audio
-    await audioEngineService.strum(step.direction, step.chord, step.strumType, time);
-
-    // 2. Visuals
-    const currentTime = audioEngineService.currentTime;
-    const delayMs = (time - currentTime) * 1000;
-
-    if (delayMs > 0) {
-      window.setTimeout(() => {
-        audioEventBus.emitSync('step', { 
-          measureIdx, 
-          stepIdx, 
-          step 
-        });
-      }, delayMs);
-    } else {
-      audioEventBus.emitSync('step', { 
-        measureIdx, 
-        stepIdx, 
-        step 
-      });
-    }
-  }
-
-  private scheduler = (): void => {
-    if (this.nextNoteTime < audioEngineService.currentTime - 0.2) {
-      this.nextNoteTime = audioEngineService.currentTime;
-    }
-
-    while (this.nextNoteTime < audioEngineService.currentTime + this.config.scheduleAheadTime) {
-      this.scheduleNote(this.currentMeasureIdx, this.currentStepIdx, this.nextNoteTime);
-      this.nextNote();
-    }
-    
-    this.timerID = window.setTimeout(this.scheduler, this.config.lookahead);
-  };
 
   public get isCurrentlyPlaying(): boolean {
     return this.isPlaying;
   }
 
   public getCurrentPosition(): { measureIdx: number; stepIdx: number } {
-    return {
-      measureIdx: this.currentMeasureIdx,
-      stepIdx: this.currentStepIdx
-    };
+    return { measureIdx: this.activeMeasureIdx, stepIdx: this.currentStep };
   }
 
   public getDuration(): number {
-    const totalSteps = this.measures.reduce((sum, measure) => sum + measure.steps.length, 0);
-    const secondsPerBeat = 60.0 / this.config.bpm;
-    const secondsPerEighth = secondsPerBeat / 2;
+    const activeMeasure = this.measures[this.activeMeasureIdx];
+    if (!activeMeasure) return 0;
     
-    return totalSteps * secondsPerEighth;
+    const stepDuration = 60 / (this.config.bpm! * 2); // 8th notes
+    return activeMeasure.steps.length * stepDuration;
   }
 
   public getCurrentTime(): number {
-    const totalStepsBefore = this.measures
-      .slice(0, this.currentMeasureIdx)
-      .reduce((sum, measure) => sum + measure.steps.length, 0);
-    
-    const currentSteps = this.currentStepIdx;
-    const totalSteps = totalStepsBefore + currentSteps;
-    
-    const secondsPerBeat = 60.0 / this.config.bpm;
-    const secondsPerEighth = secondsPerBeat / 2;
-    
-    return totalSteps * secondsPerEighth;
+    const stepDuration = 60 / (this.config.bpm! * 2); // 8th notes
+    return this.currentStep * stepDuration;
+  }
+
+  // Приватные методы для работы с событиями
+  private stepCallbacks: ((data: any) => void)[] = [];
+  private playCallbacks: ((data: any) => void)[] = [];
+  private stopCallbacks: ((data: any) => void)[] = [];
+  private errorCallbacks: ((data: any) => void)[] = [];
+
+  private emitStepEvent(stepIndex: number, step: StrumStep | null): void {
+    const data = {
+      stepIndex,
+      step,
+      measureIdx: this.activeMeasureIdx,
+      isPlaying: this.isPlaying
+    };
+    this.stepCallbacks.forEach(callback => callback(data));
+  }
+
+  private emitPlayEvent(): void {
+    const data = {
+      isPlaying: this.isPlaying,
+      measureIdx: this.activeMeasureIdx
+    };
+    this.playCallbacks.forEach(callback => callback(data));
+  }
+
+  private emitStopEvent(): void {
+    const data = {
+      isPlaying: this.isPlaying,
+      measureIdx: this.activeMeasureIdx
+    };
+    this.stopCallbacks.forEach(callback => callback(data));
+  }
+
+  // Методы для работы с событиями
+  public onStep(callback: (data: any) => void): () => void {
+    this.stepCallbacks.push(callback);
+    return () => {
+      const index = this.stepCallbacks.indexOf(callback);
+      if (index > -1) {
+        this.stepCallbacks.splice(index, 1);
+      }
+    };
+  }
+
+  public onPlay(callback: (data: any) => void): () => void {
+    this.playCallbacks.push(callback);
+    return () => {
+      const index = this.playCallbacks.indexOf(callback);
+      if (index > -1) {
+        this.playCallbacks.splice(index, 1);
+      }
+    };
+  }
+
+  public onStop(callback: (data: any) => void): () => void {
+    this.stopCallbacks.push(callback);
+    return () => {
+      const index = this.stopCallbacks.indexOf(callback);
+      if (index > -1) {
+        this.stopCallbacks.splice(index, 1);
+      }
+    };
+  }
+
+  public onError(callback: (data: any) => void): () => void {
+    this.errorCallbacks.push(callback);
+    return () => {
+      const index = this.errorCallbacks.indexOf(callback);
+      if (index > -1) {
+        this.errorCallbacks.splice(index, 1);
+      }
+    };
+  }
+
+  // Метод для синхронизации состояний
+  public syncStates(): void {
+    // Пустая реализация для совместимости
   }
 }
 

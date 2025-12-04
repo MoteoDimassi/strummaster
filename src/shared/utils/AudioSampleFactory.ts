@@ -38,6 +38,17 @@ class AudioSampleFactory {
     this.audioContext = context;
   }
 
+  private getAudioContext(): AudioContext {
+    if (!this.audioContext) {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) {
+        throw new Error('Web Audio API не поддерживается в этом браузере');
+      }
+      this.audioContext = new AudioContextClass();
+    }
+    return this.audioContext;
+  }
+
   private getSampleUrl(stringName: string, fret: number): string {
     if (stringName === 'mute') {
       return `/samples/Mute.mp3`;
@@ -98,9 +109,7 @@ class AudioSampleFactory {
   }
 
   private async loadAudioBuffer(url: string): Promise<AudioBuffer> {
-    if (!this.audioContext) {
-      throw new Error('AudioContext not initialized');
-    }
+    const audioContext = this.getAudioContext();
 
     console.log(`Fetching audio from: ${url}`);
     const response = await fetch(url);
@@ -110,7 +119,7 @@ class AudioSampleFactory {
     
     console.log(`Audio fetched successfully, decoding...`);
     const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
     console.log(`Audio decoded successfully`);
     return audioBuffer;
   }

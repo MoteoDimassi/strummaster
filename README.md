@@ -1,16 +1,400 @@
-# Run and deploy your AI Studio app
+# StrumMaster v2.0 - Guitar Rhythm Trainer
 
-This contains everything you need to run your app locally.
+StrumMaster - это веб-приложение для тренировки и создания гитарных ритмических паттернов. Приложение позволяет воспроизводить, создавать и настраивать различные паттерны переборов, а также включает встроенный тюнер для настройки гитары.
 
-View your app in AI Studio: https://ai.studio/apps/temp/1
+## Основные возможности
 
-## Run Locally
+- 🎸 Создание и воспроизведение гитарных ритмических паттернов
+- 🎵 Визуализация паттернов перебора с указанием направления (вверх/вниз)
+- 🎼 Поддержка различных типов ударов (обычный, приглушенный, пропущенный)
+- 🎛️ Встроенный тюнер с поддержкой хроматического и гитарного режимов
+- 🔊 Различные стратегии воспроизведения (базовая, агрессивная, мягкая)
+- 📝 Возможность добавления текста к каждому удару
+- ⚙️ Настройка BPM (темпа) воспроизведения
 
-**Prerequisites:**  Node.js
+## Технологический стек
 
+- **Frontend**: React 19.2.0, TypeScript
+- **State Management**: Redux Toolkit
+- **Build Tool**: Vite
+- **Audio**: Web Audio API
+- **UI Components**: Lucide React Icons
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Новая архитектура проекта
+
+Проект StrumMaster был реорганизован с использованием модульной архитектуры, которая разделяет код на два основных уровня:
+
+### Core-модули (`src/core/`)
+
+Core-модули содержат основную бизнес-логику и не зависят от UI-фреймворков. Они инкапсулируют ключевую функциональность приложения:
+
+- **AudioEngineCore** - ядро аудио-системы для воспроизведения звуков
+- **PlayerCore** - ядро проигрывателя паттернов с планировщиком
+- **TunerCore** - ядро тюнера для анализа звуковых частот
+
+### Features-модули (`src/features/`)
+
+Features-модули содержат код, связанный с конкретными функциями приложения, включая UI-компоненты и сервисы, которые используют core-модули через адаптеры:
+
+- **audio** - компоненты и сервисы для работы с аудио
+- **player** - компоненты и сервисы проигрывателя паттернов
+- **tuner** - компоненты и сервисы тюнера
+
+### Адаптеры (`src/core/adapters/`)
+
+Адаптеры обеспечивают связь между core-модулями и внешними зависимостями (браузерными API, UI-фреймворками):
+
+- **AudioEngineAdapter** - адаптер для AudioEngineCore
+- **PlayerAdapter** - адаптер для PlayerCore
+- **TunerAdapter** - адаптер для TunerCore
+- **BrowserApiAdapter** - адаптеры для браузерных API
+
+## Структура проекта
+
+```
+strummaster/
+├── samples/                    # Аудио образцы струн
+│   ├── Mute.mp3               # Звук приглушенной струны
+│   ├── 1e/, 2B/, 3G/         # Образцы для каждой струны
+│   │   └── fret0-7.mp3       # Звуки для каждого лада
+│   └── 4D/, 5A/, 6E/
+├── src/
+│   ├── core/                  # Core-модули с бизнес-логикой
+│   │   ├── audio/            # Ядро аудио-системы
+│   │   │   ├── AudioEngineCore.ts
+│   │   │   └── index.ts
+│   │   ├── player/           # Ядро проигрывателя
+│   │   │   ├── PlayerCore.ts
+│   │   │   └── index.ts
+│   │   ├── tuner/            # Ядро тюнера
+│   │   │   ├── TunerCore.ts
+│   │   │   └── index.ts
+│   │   ├── adapters/         # Адаптеры для интеграции
+│   │   │   ├── AudioEngineAdapter.ts
+│   │   │   ├── PlayerAdapter.ts
+│   │   │   ├── TunerAdapter.ts
+│   │   │   ├── BrowserApiAdapter.ts
+│   │   │   └── index.ts
+│   │   └── index.ts          # Экспорт всех core-модулей
+│   ├── domain/               # Сущности предметной области
+│   │   └── entities/         # Интерфейсы AudioConfig, Measure, StrumStep
+│   ├── features/             # Функциональные модули
+│   │   ├── audio/            # Модуль аудио системы
+│   │   │   └── services/
+│   │   │       └── AudioEngineService.ts
+│   │   ├── player/           # Модуль проигрывателя паттернов
+│   │   │   ├── components/   # UI компоненты проигрывателя
+│   │   │   └── services/
+│   │   │       └── PlayerService.ts
+│   │   └── tuner/            # Модуль тюнера
+│   │       ├── components/   # UI компоненты тюнера
+│   │       └── services/
+│   │           └── TunerService.ts
+│   ├── shared/               # Общие компоненты и утилиты
+│   │   ├── components/       # Общие UI компоненты
+│   │   └── utils/            # Утилиты (AudioEventBus, AudioSampleFactory)
+│   ├── store/                # Управление состоянием Redux
+│   │   └── slices/           # Redux срезы (player, audio, tuner)
+│   ├── App.tsx               # Основной компонент приложения
+│   └── index.css             # Глобальные стили
+├── index.html                # HTML точка входа
+├── index.tsx                 # React точка входа
+├── package.json              # Зависимости проекта
+├── tsconfig.json             # Конфигурация TypeScript
+└── vite.config.ts            # Конфигурация Vite
+```
+
+## Преимущества новой архитектуры
+
+### 1. Переиспользуемость
+
+Core-модули не зависят от UI-фреймворков и могут быть использованы в других проектах:
+
+```typescript
+// Пример использования AudioEngineCore в другом проекте
+import { AudioEngineCore } from "strummaster/core";
+
+const audioEngine = new AudioEngineCore();
+await audioEngine.strum("down", "Am", "strum");
+```
+
+### 2. Тестируемость
+
+Разделение на core-модули и адаптеры упрощает модульное тестирование:
+
+```typescript
+// Пример тестирования PlayerCore с мок-адаптерами
+const mockTimerAdapter = {
+  setTimeout: jest.fn(),
+  clearTimeout: jest.fn(),
+};
+
+const mockAudioEngineAdapter = {
+  currentTime: 0,
+  resume: jest.fn(),
+  strum: jest.fn(),
+  stopAllSounds: jest.fn(),
+};
+
+const playerCore = new PlayerCore(
+  mockTimerAdapter,
+  mockAudioEngineAdapter,
+  mockEventBusAdapter
+);
+```
+
+### 3. Модульность
+
+Каждый core-модуль инкапсулирует свою логику и может быть разработан независимо:
+
+- **AudioEngineCore** отвечает только за воспроизведение звуков
+- **PlayerCore** отвечает только за планирование и управление воспроизведением
+- **TunerCore** отвечает только за анализ звуковых частот
+
+## Примеры использования core-модулей
+
+### Использование AudioEngineCore
+
+```typescript
+import {
+  AudioEngineCore,
+  AudioContextAdapter,
+  GainNodeAdapter,
+} from "strummaster/core";
+
+// Создание экземпляра AudioEngineCore
+const audioEngine = new AudioEngineCore(
+  audioContextAdapter, // Адаптер AudioContext
+  gainNodeAdapter, // Адаптер GainNode
+  sampleFactoryAdapter, // Адаптер фабрики сэмплов
+  strategyFactoryAdapter, // Адаптер фабрики стратегий
+  eventBusAdapter // Адаптер шины событий
+);
+
+// Воспроизведение перебора
+await audioEngine.strum("down", "Am", "strum");
+
+// Воспроизведение отдельной ноты
+await audioEngine.playNote("1e", 3);
+
+// Установка стратегии воспроизведения
+audioEngine.setPlaybackStrategy("aggressive");
+```
+
+### Использование PlayerCore
+
+```typescript
+import {
+  PlayerCore,
+  TimerAdapter,
+  AudioEngineAdapter,
+  EventBusAdapter,
+} from "strummaster/core";
+
+// Создание экземпляра PlayerCore
+const player = new PlayerCore(
+  timerAdapter, // Адаптер таймера
+  audioEngineAdapter, // Адаптер аудио движка
+  eventBusAdapter // Адаптер шины событий
+);
+
+// Установка паттернов для воспроизведения
+player.setMeasures(measures);
+
+// Настройка конфигурации
+player.setConfig({ bpm: 120, lookahead: 25.0, scheduleAheadTime: 0.1 });
+
+// Начало воспроизведения
+await player.start();
+
+// Остановка воспроизведения
+player.stop();
+```
+
+### Использование TunerCore
+
+```typescript
+import {
+  TunerCore,
+  AudioDataAdapter,
+  AnimationAdapter,
+} from "strummaster/core";
+
+// Создание экземпляра TunerCore
+const tuner = new TunerCore();
+
+// Анализ частоты
+const frequency = 440; // A4
+const result = tuner.analyzeFrequency(frequency);
+
+// Анализ частоты для гитарного строя
+const guitarResult = tuner.analyzeFrequencyForGuitar(frequency);
+
+// Получение ближайшей ноты гитарного строя
+const closestNote = tuner.getClosestGuitarNote(frequency);
+
+// Запуск непрерывного анализа
+const stopAnalysis = tuner.startContinuousAnalysis(
+  audioDataAdapter,
+  animationAdapter,
+  buffer,
+  (result) => {
+    if (result) {
+      console.log(
+        `Note: ${result.note}, Frequency: ${result.frequency}Hz, Cents: ${result.cents}`
+      );
+    }
+  },
+  () => isRunning
+);
+```
+
+## Использование адаптеров для интеграции с UI
+
+Адаптеры обеспечивают удобную интеграцию core-модулей с UI-кодом:
+
+```typescript
+// Использование AudioEngineAdapter в React-компоненте
+import { audioEngineAdapter } from "strummaster/core/adapters";
+
+function AudioPlayer() {
+  const handlePlayStrum = async () => {
+    await audioEngineAdapter.strum("down", "Am", "strum");
+  };
+
+  const handleVolumeChange = (volume: number) => {
+    audioEngineAdapter.setVolume(volume);
+  };
+
+  return (
+    <div>
+      <button onClick={handlePlayStrum}>Play Strum</button>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.1"
+        onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+      />
+    </div>
+  );
+}
+```
+
+```typescript
+// Использование PlayerAdapter в React-компоненте
+import { playerAdapter } from "strummaster/core/adapters";
+
+function PatternPlayer() {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = playerAdapter.onPlay(() => {
+      setIsPlaying(true);
+    });
+
+    const unsubscribeStop = playerAdapter.onStop(() => {
+      setIsPlaying(false);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeStop();
+    };
+  }, []);
+
+  const handleStart = async () => {
+    await playerAdapter.start();
+  };
+
+  const handleStop = () => {
+    playerAdapter.stop();
+  };
+
+  return (
+    <div>
+      <button onClick={handleStart} disabled={isPlaying}>
+        Start
+      </button>
+      <button onClick={handleStop} disabled={!isPlaying}>
+        Stop
+      </button>
+    </div>
+  );
+}
+```
+
+```typescript
+// Использование TunerAdapter в React-компоненте
+import { tunerAdapter } from "strummaster/core/adapters";
+
+function GuitarTuner() {
+  const [tunerResult, setTunerResult] = useState(null);
+
+  useEffect(() => {
+    const startTuner = async () => {
+      await tunerAdapter.start();
+
+      tunerAdapter.startContinuousAnalysis((result) => {
+        setTunerResult(result);
+      });
+    };
+
+    startTuner();
+
+    return () => {
+      tunerAdapter.stop();
+    };
+  }, []);
+
+  return (
+    <div>
+      {tunerResult && (
+        <div>
+          <p>Note: {tunerResult.note}</p>
+          <p>Frequency: {tunerResult.frequency}Hz</p>
+          <p>Cents: {tunerResult.cents}</p>
+          <p>In Tune: {tunerResult.isInTune ? "Yes" : "No"}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## Запуск приложения
+
+**Предварительные требования:** Node.js
+
+1. Установка зависимостей:
+
+   ```bash
+   npm install
+   ```
+
+2. Запуск приложения в режиме разработки:
+
+   ```bash
+   npm run dev
+   ```
+
+3. Сборка приложения для продакшена:
+
+   ```bash
+   npm run build
+   ```
+
+4. Предпросмотр собранного приложения:
+   ```bash
+   npm run preview
+   ```
+
+## Особенности реализации
+
+- Использование Web Audio API для высокоточного воспроизведения звуков
+- Ленивая загрузка аудио образцов для оптимизации производительности
+- Поддержка различных стратегий воспроизведения для создания разнообразных звуков
+- Реактивное обновление UI через события аудио системы
+- Адаптивный дизайн для работы на различных устройствах
+- Модульная архитектура с разделением на core-модули и UI-слой
+- Адаптеры для интеграции core-модулей с внешними зависимостями
