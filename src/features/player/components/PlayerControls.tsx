@@ -102,7 +102,7 @@ export const PlayerControls: React.FC = () => {
         {/* BPM Control */}
         <div className="flex-1 w-full flex flex-col gap-2">
           <div className="flex justify-between text-slate-300 font-medium">
-            <span>Tempo</span>
+            <span>Темп</span>
           </div>
           <div className="flex gap-2 items-center">
             <input
@@ -162,8 +162,8 @@ export const PlayerControls: React.FC = () => {
             </div>
           </div>
           <div className="flex justify-between text-xs text-slate-500">
-            <span>Slow</span>
-            <span>Fast</span>
+            <span>Медленно</span>
+            <span>Быстро</span>
           </div>
         </div>
 
@@ -172,7 +172,7 @@ export const PlayerControls: React.FC = () => {
 
         {/* Length Controls */}
         <div className="flex flex-col items-center gap-2">
-          <span className="text-slate-300 text-sm font-medium">Length</span>
+          <span className="text-slate-300 text-sm font-medium">Длина</span>
           <div className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-700">
             <button 
               onClick={() => handleStepCountChange(-2)}
@@ -201,7 +201,7 @@ export const PlayerControls: React.FC = () => {
         <button 
           onClick={handleReset}
           className="p-3 text-slate-400 hover:text-white hover:bg-slate-700 rounded-full transition-colors"
-          title="Reset Pattern"
+          title="Сбросить паттерн"
         >
           <RotateCcw size={20} />
         </button>

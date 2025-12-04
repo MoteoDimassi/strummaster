@@ -76,11 +76,11 @@ export const StrumNode: React.FC<StrumNodeProps> = ({ step, isActive, onClick, o
 
       {/* Lyrics Input */}
       <div className="w-16">
-        <input 
-          type="text" 
+        <input
+          type="text"
           value={step.lyrics}
           onChange={(e) => onLyricsChange(e.target.value)}
-          placeholder="lyric"
+          placeholder="текст"
           className={`
             w-full bg-transparent text-center text-sm border-b border-dashed focus:outline-none focus:border-amber-500
             placeholder:text-slate-700

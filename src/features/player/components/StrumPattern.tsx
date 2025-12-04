@@ -59,7 +59,7 @@ export const StrumPattern: React.FC = () => {
       
       <p className="text-center text-slate-500 mt-6 flex items-center justify-center gap-2 text-sm">
         <Info size={16} />
-        <span className="hidden md:inline">Edit mode:</span> Tap arrow to cycle: Strum → Mute → Ghost. Type below arrow for lyrics.
+        <span className="hidden md:inline">Режим редактирования:</span> Нажмите на стрелку для переключения: Удар → Приглушение → Пропуск. Введите текст под стрелкой для добавления слов.
         {hasUnsavedChanges && (
           <span className="ml-2 text-amber-400 font-medium">Есть несохраненные изменения в такте!</span>
         )}

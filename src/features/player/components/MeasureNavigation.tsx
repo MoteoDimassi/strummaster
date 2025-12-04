@@ -46,7 +46,7 @@ export const MeasureNavigation: React.FC = () => {
           <ChevronLeft size={20} />
         </button>
         <div className="flex flex-col items-center px-4 min-w-[100px]">
-          <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">Measure</span>
+          <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">Такт</span>
           <span className="text-2xl font-mono font-bold text-white">
             {activeMeasureIdx + 1} <span className="text-slate-500 text-lg">/ {measures.length}</span>
           </span>
@@ -62,7 +62,7 @@ export const MeasureNavigation: React.FC = () => {
 
       {/* Chord Editor */}
       <div className="flex items-center gap-3">
-         <label className="text-sm text-slate-400 font-medium">Chord:</label>
+         <label className="text-sm text-slate-400 font-medium">Аккорд:</label>
          <select
            value={currentChord}
            onChange={(e) => handleChordChange(e.target.value)}
@@ -79,14 +79,14 @@ export const MeasureNavigation: React.FC = () => {
         <button
           onClick={handleAddMeasure}
           className="flex items-center gap-1 px-3 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg text-sm font-medium transition-colors border border-emerald-600/30"
-        >
-          <Plus size={16} /> Add Bar
+         >
+           <Plus size={16} /> Добавить такт
         </button>
         {measures.length > 1 && (
           <button
             onClick={handleRemoveMeasure}
             className="p-2 bg-rose-900/20 hover:bg-rose-900/40 text-rose-400 rounded-lg transition-colors border border-rose-900/30"
-            title="Delete Current Measure"
+            title="Удалить текущий такт"
           >
             <Trash2 size={18} />
           </button>

@@ -6,7 +6,6 @@ import { MeasureNavigation } from './features/player/components/MeasureNavigatio
 import { PatternControls } from './features/player/components/PatternControls';
 import { StrumPattern } from './features/player/components/StrumPattern';
 import { PlayerControls } from './features/player/components/PlayerControls';
-import { TunerButton } from './features/tuner/components/TunerButton';
 import { TunerModal } from './features/tuner/components/TunerModal';
 import { useAppSelector, useAppDispatch } from './store/hooks';
 import { setCurrentDisplayStepIdx } from './store/slices/playerSlice';
@@ -46,9 +45,6 @@ const AppContent: React.FC = () => {
         
         {/* Measure Navigation & Info */}
         <MeasureNavigation />
-
-        {/* Tuner Button */}
-        <TunerButton />
 
         {/* Pattern Controls */}
         <PatternControls />

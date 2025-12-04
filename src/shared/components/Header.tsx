@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Music, Volume2, ChevronDown, Menu, X } from 'lucide-react';
+import { useAppDispatch } from '../../store/hooks';
+import { openTuner } from '../../store/slices/tunerSlice';
 
 export const Header: React.FC = () => {
   const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const dispatch = useAppDispatch();
 
   const handleNavClick = (item: string) => {
     console.log(`Нажато на: ${item}`);
@@ -14,6 +17,10 @@ export const Header: React.FC = () => {
     console.log(`Выбран инструмент: ${tool}`);
     setIsToolsDropdownOpen(false);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleOpenTuner = () => {
+    dispatch(openTuner());
   };
 
   return (
@@ -94,10 +101,17 @@ export const Header: React.FC = () => {
           >
             Табы
           </button>
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-500 border border-slate-800 px-3 py-1 rounded-full ml-4">
-            <Volume2 size={12} />
-            <span>Synth Active</span>
-          </div>
+          <button
+            onClick={handleOpenTuner}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors ml-4"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Тюнер
+          </button>
         </nav>
 
         {/* Mobile menu button */}
@@ -174,10 +188,17 @@ export const Header: React.FC = () => {
             >
               Табы
             </button>
-            <div className="flex items-center gap-2 text-xs font-mono text-slate-500 border border-slate-800 px-3 py-1 rounded-full">
-              <Volume2 size={12} />
-              <span>Synth Active</span>
-            </div>
+            <button
+              onClick={handleOpenTuner}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              Тюнер
+            </button>
           </nav>
         </div>
       )}
