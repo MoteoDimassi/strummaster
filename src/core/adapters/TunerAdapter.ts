@@ -11,6 +11,7 @@ class WebAudioDataAdapter implements AudioDataAdapter {
   private analyser: AnalyserNode | null = null;
   private audioContext: AudioContext | null = null;
   private audioApiAdapter: AudioApiAdapter;
+  private stream: MediaStream | null = null;
 
   constructor(audioApiAdapter?: AudioApiAdapter) {
     this.audioApiAdapter = audioApiAdapter || BrowserApiAdapterFactory.createAudioAdapter();
@@ -66,6 +67,35 @@ class WebAudioDataAdapter implements AudioDataAdapter {
   getSampleRate(): number {
     return this.audioContext?.sampleRate || 44100;
   }
+
+  async connectMicrophone(): Promise<void> {
+    this.ensureAnalyser();
+    if (!this.audioContext || !this.analyser) {
+      throw new Error('AudioContext or Analyser not initialized');
+    }
+
+    try {
+      this.stream = await this.audioApiAdapter.getUserMedia();
+      const source = this.audioApiAdapter.createMediaStreamSource(this.audioContext, this.stream);
+      source.connect(this.analyser);
+      
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+      }
+      console.log('[WebAudioDataAdapter] Микрофон успешно подключен');
+    } catch (error) {
+      console.error('[WebAudioDataAdapter] Ошибка подключения микрофона:', error);
+      throw error;
+    }
+  }
+
+  disconnectMicrophone(): void {
+    if (this.stream) {
+      this.stream.getTracks().forEach(track => track.stop());
+      this.stream = null;
+      console.log('[WebAudioDataAdapter] Микрофон отключен');
+    }
+  }
 }
 
 // Адаптер для Animation на основе AnimationApiAdapter
@@ -91,6 +121,7 @@ export class TunerAdapter {
   private animationAdapter: WebAnimationAdapter;
   private buffer: Float32Array;
   private stopContinuousAnalysis: (() => void) | null = null;
+  private isRunning: boolean = false;
 
   constructor(
     animationApiAdapter?: AnimationApiAdapter,
@@ -140,16 +171,20 @@ export class TunerAdapter {
   // Методы для работы с адаптером
   async start(): Promise<void> {
     console.log('[TunerAdapter] Запуск тюнера');
+    this.isRunning = true;
     await this.initialize();
-    console.log('[TunerAdapter] ВНИМАНИЕ: Отсутствует захват аудио с микрофона!');
+    await this.audioDataAdapter.connectMicrophone();
   }
 
   stop(): void {
+    console.log('[TunerAdapter] Остановка тюнера');
+    this.isRunning = false;
     // Останавливаем непрерывный анализ, если он запущен
     if (this.stopContinuousAnalysis) {
       this.stopContinuousAnalysis();
       this.stopContinuousAnalysis = null;
     }
+    this.audioDataAdapter.disconnectMicrophone();
   }
 
   async getPitch(): Promise<TunerResult | null> {
@@ -175,12 +210,12 @@ export class TunerAdapter {
       this.animationAdapter,
       this.buffer,
       (result) => {
-        console.log('[TunerAdapter] Результат анализа:', result);
+        // console.log('[TunerAdapter] Результат анализа:', result); // Слишком много логов
         callback(result);
       },
-      () => false // Всегда возвращаем false, так как нет прямого доступа к сервису
+      () => this.isRunning
     );
-    console.log('[TunerAdapter] ВНИМАНИЕ: Анализ запущен, но без реального источника аудио!');
+    console.log('[TunerAdapter] Анализ запущен');
   }
 
   // Метод оставлен для совместимости, но не выполняет функционал
@@ -195,8 +230,7 @@ export class TunerAdapter {
 
   // Метод для получения состояния
   isAudioRunning(): boolean {
-    // Всегда возвращаем false, так как нет прямого доступа к сервису
-    return false;
+    return this.isRunning;
   }
 
   // Метод для переключения между режимами анализа

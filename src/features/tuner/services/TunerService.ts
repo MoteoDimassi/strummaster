@@ -1,4 +1,5 @@
 import { TunerResult } from '../../../domain/entities';
+import { tunerAdapter } from '../../../core/adapters/TunerAdapter';
 
 declare global {
   interface Window {
@@ -10,48 +11,49 @@ export class TunerService {
   private isRunning: boolean = false;
 
   async start(): Promise<void> {
-    console.log('[TunerService] Запуск тюнера - ПУСТАЯ РЕАЛИЗАЦИЯ!');
+    console.log('[TunerService] Запуск тюнера');
+    await tunerAdapter.start();
     this.isRunning = true;
   }
 
   stop(): void {
     console.log('[TunerService] Остановка тюнера');
+    tunerAdapter.stop();
     this.isRunning = false;
   }
 
   async getPitch(): Promise<TunerResult | null> {
-    console.log('[TunerService] Запрос высоты тона - ПУСТАЯ РЕАЛИЗАЦИЯ!');
-    return null;
+    return tunerAdapter.getPitch();
   }
 
   startContinuousAnalysis(callback: (result: TunerResult | null) => void): void {
-    console.log('[TunerService] Запуск непрерывного анализа - ПУСТАЯ РЕАЛИЗАЦИЯ!');
-    // Пустая реализация для совместимости
+    console.log('[TunerService] Запуск непрерывного анализа');
+    tunerAdapter.startContinuousAnalysis(callback);
   }
 
   // Методы для прямого использования TunerCore
   analyzeFrequency(frequency: number): TunerResult {
-    return { note: '', frequency: 0, cents: 0, isInTune: false };
+    return tunerAdapter.analyzeFrequency(frequency);
   }
 
   analyzeFrequencyForGuitar(frequency: number): TunerResult {
-    return { note: '', frequency: 0, cents: 0, isInTune: false };
+    return tunerAdapter.analyzeFrequencyForGuitar(frequency);
   }
 
   getClosestGuitarNote(pitch: number) {
-    return null;
+    return tunerAdapter.getClosestGuitarNote(pitch);
   }
 
   getGuitarNotes() {
-    return [];
+    return tunerAdapter.getGuitarNotes();
   }
 
   frequencyFromNoteNumber(note: number): number {
-    return 0;
+    return tunerAdapter.frequencyFromNoteNumber(note);
   }
 
   autoCorrelate(buf: Float32Array, sampleRate: number): number {
-    return 0;
+    return tunerAdapter.autoCorrelate(buf, sampleRate);
   }
 
   isAudioRunning(): boolean {
@@ -60,12 +62,12 @@ export class TunerService {
 
   // Метод для переключения между режимами анализа
   useTunerCoreAnalysis(useCore: boolean): void {
-    // Пустая реализация для совместимости
+    tunerAdapter.useTunerCoreAnalysis(useCore);
   }
 
   // Метод для прямого использования TunerService
   startTunerServiceAnalysis(callback: (result: TunerResult | null) => void): void {
-    // Пустая реализация для совместимости
+    tunerAdapter.startTunerServiceAnalysis(callback);
   }
 }
 
