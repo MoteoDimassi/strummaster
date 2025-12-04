@@ -10,18 +10,22 @@ export class TunerService {
   private isRunning: boolean = false;
 
   async start(): Promise<void> {
+    console.log('[TunerService] Запуск тюнера - ПУСТАЯ РЕАЛИЗАЦИЯ!');
     this.isRunning = true;
   }
 
   stop(): void {
+    console.log('[TunerService] Остановка тюнера');
     this.isRunning = false;
   }
 
   async getPitch(): Promise<TunerResult | null> {
+    console.log('[TunerService] Запрос высоты тона - ПУСТАЯ РЕАЛИЗАЦИЯ!');
     return null;
   }
 
   startContinuousAnalysis(callback: (result: TunerResult | null) => void): void {
+    console.log('[TunerService] Запуск непрерывного анализа - ПУСТАЯ РЕАЛИЗАЦИЯ!');
     // Пустая реализация для совместимости
   }
 

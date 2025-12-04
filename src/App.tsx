@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import { Header } from './shared/components/Header';
+import { Header, Footer } from './shared/components';
 import { MeasureNavigation } from './features/player/components/MeasureNavigation';
 import { PatternControls } from './features/player/components/PatternControls';
 import { StrumPattern } from './features/player/components/StrumPattern';
@@ -61,9 +61,7 @@ const AppContent: React.FC = () => {
 
       </main>
 
-      <footer className="p-4 text-center text-slate-700 text-sm">
-        StrumMaster v2.0 &bull; Measures & Lyrics
-      </footer>
+      <Footer />
 
       {/* Tuner Modal */}
       <TunerModal />

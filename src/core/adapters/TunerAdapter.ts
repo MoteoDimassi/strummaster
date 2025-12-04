@@ -25,15 +25,42 @@ class WebAudioDataAdapter implements AudioDataAdapter {
   // Метод для создания анализатора, если он не был установлен извне
   ensureAnalyser(): void {
     if (!this.analyser || !this.audioContext) {
+      console.log('[WebAudioDataAdapter] Создание AudioContext и AnalyserNode');
       this.audioContext = this.audioApiAdapter.createAudioContext();
       this.analyser = this.audioApiAdapter.createAnalyser(this.audioContext);
+      console.log('[WebAudioDataAdapter] ВНИМАНИЕ: AnalyserNode создан, но не подключен к источнику аудио!');
     }
   }
 
   getFloatTimeDomainData(buffer: Float32Array): void {
     if (this.analyser) {
+      // Проверяем, подключен ли анализатор к какому-либо источнику
+      const hasData = this.checkForAudioData();
+      if (!hasData) {
+        console.warn('[WebAudioDataAdapter] ОШИБКА: AnalyserNode не подключен к источнику аудио!');
+      }
       this.analyser.getFloatTimeDomainData(buffer as any);
     }
+  }
+
+  // Вспомогательный метод для проверки наличия аудиоданных
+  private checkForAudioData(): boolean {
+    if (!this.analyser) return false;
+    
+    // Проверяем, есть ли какие-либо данные в анализаторе
+    const tempBuffer = new Float32Array(128);
+    this.analyser.getFloatTimeDomainData(tempBuffer);
+    
+    // Проверяем, есть ли ненулевые значения
+    let hasSignal = false;
+    for (let i = 0; i < tempBuffer.length; i++) {
+      if (tempBuffer[i] !== 0) {
+        hasSignal = true;
+        break;
+      }
+    }
+    
+    return hasSignal;
   }
 
   getSampleRate(): number {
@@ -79,8 +106,10 @@ export class TunerAdapter {
 
   // Инициализация адаптера
   async initialize(): Promise<void> {
+    console.log('[TunerAdapter] Инициализация адаптера тюнера');
     // Убеждаемся, что у нас есть анализатор
     this.audioDataAdapter.ensureAnalyser();
+    console.log('[TunerAdapter] Анализатор создан, но нет подключения к микрофону');
   }
 
   // Делегируем вызовы к TunerCore
@@ -110,7 +139,9 @@ export class TunerAdapter {
 
   // Методы для работы с адаптером
   async start(): Promise<void> {
+    console.log('[TunerAdapter] Запуск тюнера');
     await this.initialize();
+    console.log('[TunerAdapter] ВНИМАНИЕ: Отсутствует захват аудио с микрофона!');
   }
 
   stop(): void {
@@ -127,9 +158,15 @@ export class TunerAdapter {
   }
 
   startContinuousAnalysis(callback: (result: TunerResult | null) => void): void {
+    console.log('[TunerAdapter] Запуск непрерывного анализа');
     // Останавливаем предыдущий анализ, если он был запущен
     if (this.stopContinuousAnalysis) {
       this.stopContinuousAnalysis();
+    }
+
+    // Проверяем, есть ли анализатор
+    if (!this.audioDataAdapter['analyser']) {
+      console.error('[TunerAdapter] ОШИБКА: AnalyserNode не инициализирован!');
     }
 
     // Запускаем непрерывный анализ через TunerCore
@@ -137,9 +174,13 @@ export class TunerAdapter {
       this.audioDataAdapter,
       this.animationAdapter,
       this.buffer,
-      callback,
+      (result) => {
+        console.log('[TunerAdapter] Результат анализа:', result);
+        callback(result);
+      },
       () => false // Всегда возвращаем false, так как нет прямого доступа к сервису
     );
+    console.log('[TunerAdapter] ВНИМАНИЕ: Анализ запущен, но без реального источника аудио!');
   }
 
   // Метод оставлен для совместимости, но не выполняет функционал

@@ -19,6 +19,8 @@ export interface AnimationApiAdapter {
 export interface AudioApiAdapter {
   createAudioContext(): AudioContext;
   createAnalyser(context: AudioContext): AnalyserNode;
+  getUserMedia(constraints?: MediaStreamConstraints): Promise<MediaStream>;
+  createMediaStreamSource(context: AudioContext, stream: MediaStream): MediaStreamAudioSourceNode;
 }
 
 // Реализация адаптера для таймеров на основе браузерного API
@@ -48,11 +50,40 @@ export class WebAnimationApiAdapter implements AnimationApiAdapter {
 // Реализация адаптера для аудио на основе браузерного API
 export class WebAudioApiAdapter implements AudioApiAdapter {
   createAudioContext(): AudioContext {
+    console.log('[WebAudioApiAdapter] Создание AudioContext');
     return new AudioContext();
   }
 
   createAnalyser(context: AudioContext): AnalyserNode {
-    return context.createAnalyser();
+    console.log('[WebAudioApiAdapter] Создание AnalyserNode');
+    const analyser = context.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.8;
+    return analyser;
+  }
+
+  async getUserMedia(constraints?: MediaStreamConstraints): Promise<MediaStream> {
+    console.log('[WebAudioApiAdapter] Запрос доступа к микрофону');
+    const defaultConstraints: MediaStreamConstraints = constraints || {
+      audio: {
+        echoCancellation: false,
+        autoGainControl: false
+      }
+    };
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(defaultConstraints);
+      console.log('[WebAudioApiAdapter] Доступ к микрофону получен');
+      return stream;
+    } catch (error) {
+      console.error('[WebAudioApiAdapter] Ошибка доступа к микрофону:', error);
+      throw error;
+    }
+  }
+
+  createMediaStreamSource(context: AudioContext, stream: MediaStream): MediaStreamAudioSourceNode {
+    console.log('[WebAudioApiAdapter] Создание MediaStreamAudioSourceNode');
+    return context.createMediaStreamSource(stream);
   }
 }
 

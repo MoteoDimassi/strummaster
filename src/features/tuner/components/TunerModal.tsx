@@ -32,17 +32,20 @@ export const TunerModal: React.FC = () => {
   }, [isOpen, isRunning]);
 
   const startTunerService = async () => {
+    console.log('[TunerModal] Запуск тюнера через tunerService');
     try {
       await tunerService.start();
       dispatch(startTuner());
       
       // Start continuous analysis
       tunerService.startContinuousAnalysis((result) => {
+        console.log('[TunerModal] Получен результат от tunerService:', result);
         if (result) {
           dispatch(updateTunerResult(result));
         }
       });
     } catch (err) {
+      console.error('[TunerModal] Ошибка при запуске тюнера:', err);
       const errorMessage = err instanceof Error ? err.message : 'Не удалось запустить тюнер';
       dispatch(setTunerError(errorMessage));
     }

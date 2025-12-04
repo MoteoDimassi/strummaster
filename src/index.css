@@ -1,7 +1,8 @@
 /* Дополнительные стили для StrumMaster */
 
 /* Убираем ограничение ширины для всего приложения */
-html, body {
+html,
+body {
   width: 100% !important;
   overflow-x: hidden !important;
 }
@@ -33,8 +34,165 @@ html, body {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   .strum-container {
     gap: 0.5rem;
   }
+}
+
+/* Дополнительные стили для Header и Footer */
+
+/* Улучшенные стили для Header */
+header {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+/* Анимация для логотипа в Header */
+header .bg-gradient-to-br {
+  transition: all 0.3s ease;
+}
+
+header .bg-gradient-to-br:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(251, 146, 60, 0.3),
+    0 4px 6px -2px rgba(251, 146, 60, 0.2);
+}
+
+/* Улучшенные стили для выпадающего меню в Header */
+header .absolute {
+  animation: dropdownFadeIn 0.2s ease-out;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Улучшенные стили для мобильного меню */
+header .md\\:hidden {
+  transition: all 0.3s ease;
+}
+
+/* Улучшенные стили для Footer */
+footer {
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+/* Анимация для логотипа в Footer */
+footer .bg-gradient-to-br {
+  transition: all 0.3s ease;
+}
+
+footer .bg-gradient-to-br:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(251, 146, 60, 0.3),
+    0 4px 6px -2px rgba(251, 146, 60, 0.2);
+}
+
+/* Улучшенные стили для иконок социальных сетей */
+footer .bg-slate-800 {
+  transition: all 0.3s ease;
+}
+
+footer .bg-slate-800:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Дополнительные стили для адаптивности */
+@media (max-width: 640px) {
+  header {
+    padding: 1rem;
+  }
+
+  header h1 {
+    font-size: 1.125rem;
+  }
+
+  header p {
+    font-size: 0.75rem;
+  }
+
+  footer {
+    padding: 1.5rem 1rem;
+  }
+
+  footer h3 {
+    font-size: 1rem;
+  }
+
+  footer h4 {
+    font-size: 0.875rem;
+  }
+}
+
+/* Улучшенные стили для индикатора "Synth Active" */
+header .border,
+footer .border {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Улучшенные стили для навигационных ссылок */
+header button:not(.md\\:hidden):not(.bg-slate-800) {
+  position: relative;
+}
+
+header button:not(.md\\:hidden):not(.bg-slate-800)::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 50%;
+  background-color: rgba(251, 146, 60, 0.7);
+  transition: all 0.3s ease;
+}
+
+header button:not(.md\\:hidden):not(.bg-slate-800):hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Улучшенные стили для ссылок в футере */
+footer button {
+  position: relative;
+}
+
+footer button:not(.bg-slate-800)::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 50%;
+  background-color: rgba(251, 146, 60, 0.7);
+  transition: all 0.3s ease;
+}
+
+footer button:not(.bg-slate-800):hover::after {
+  width: 100%;
+  left: 0;
 }
