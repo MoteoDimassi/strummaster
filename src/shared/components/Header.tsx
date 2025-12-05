@@ -3,18 +3,24 @@ import { Music, Volume2, ChevronDown, Menu, X } from 'lucide-react';
 import { useAppDispatch } from '../../store/hooks';
 import { openTuner } from '../../store/slices/tunerSlice';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onToolSelect?: (tool: string) => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
   const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
 
   const handleNavClick = (item: string) => {
     console.log(`Нажато на: ${item}`);
+    if (onToolSelect) onToolSelect(item); // Reset tool selection if navigating away
     setIsMobileMenuOpen(false);
   };
 
   const handleToolsClick = (tool: string) => {
     console.log(`Выбран инструмент: ${tool}`);
+    if (onToolSelect) onToolSelect(tool);
     setIsToolsDropdownOpen(false);
     setIsMobileMenuOpen(false);
   };
@@ -85,6 +91,12 @@ export const Header: React.FC = () => {
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Генератор аккордов
+                </button>
+                <button
+                  onClick={() => handleToolsClick('Музыкальный диктант')}
+                  className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                >
+                  Музыкальный диктант
                 </button>
               </div>
             )}
@@ -172,6 +184,12 @@ export const Header: React.FC = () => {
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Генератор аккордов
+                  </button>
+                  <button
+                    onClick={() => handleToolsClick('Музыкальный диктант')}
+                    className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
+                  >
+                    Музыкальный диктант
                   </button>
                 </div>
               )}
