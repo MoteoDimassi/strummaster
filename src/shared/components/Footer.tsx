@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Send, Type, Instagram, Youtube, Music } from 'lucide-react';
 

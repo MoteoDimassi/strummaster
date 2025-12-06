@@ -1,0 +1,7 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/dictation/page": "app/dictation/page.js",
+  "/page": "app/page.js",
+  "/strumbuilder/page": "app/strumbuilder/page.js",
+  "/tuner/page": "app/tuner/page.js"
+}

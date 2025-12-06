@@ -15,7 +15,7 @@ import { TunerControls } from './TunerControls';
 
 export const TunerModal: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { isOpen, isRunning, mode, error } = useAppSelector(state => state.tuner);
+  const { isOpen, isRunning, mode, error, currentNote, currentFrequency, currentDetune, pointerPosition, isInTune } = useAppSelector(state => state.tuner);
 
   useEffect(() => {
     if (isOpen && !isRunning) {
@@ -100,7 +100,13 @@ export const TunerModal: React.FC = () => {
         />
 
         {/* Дисплей тюнера */}
-        <TunerDisplay />
+        <TunerDisplay
+          currentNote={currentNote}
+          currentFrequency={currentFrequency}
+          currentDetune={currentDetune}
+          pointerPosition={pointerPosition}
+          isInTune={isInTune}
+        />
       </div>
     </div>
   );

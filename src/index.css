@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Дополнительные стили для StrumMaster */
 
 /* Убираем ограничение ширины для всего приложения */
@@ -79,7 +83,7 @@ header .absolute {
 }
 
 /* Улучшенные стили для мобильного меню */
-header .md\\:hidden {
+header .md\:hidden {
   transition: all 0.3s ease;
 }
 
@@ -156,11 +160,11 @@ footer .border {
 }
 
 /* Улучшенные стили для навигационных ссылок */
-header button:not(.md\\:hidden):not(.bg-slate-800) {
+header button:not(.md\:hidden):not(.bg-slate-800) {
   position: relative;
 }
 
-header button:not(.md\\:hidden):not(.bg-slate-800)::after {
+header button:not(.md\:hidden):not(.bg-slate-800)::after {
   content: "";
   position: absolute;
   width: 0;
@@ -171,7 +175,7 @@ header button:not(.md\\:hidden):not(.bg-slate-800)::after {
   transition: all 0.3s ease;
 }
 
-header button:not(.md\\:hidden):not(.bg-slate-800):hover::after {
+header button:not(.md\:hidden):not(.bg-slate-800):hover::after {
   width: 100%;
   left: 0;
 }

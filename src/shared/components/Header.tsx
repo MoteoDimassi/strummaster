@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Music, Volume2, ChevronDown, Menu, X } from 'lucide-react';
 import { useAppDispatch } from '../../store/hooks';
 import { openTuner } from '../../store/slices/tunerSlice';
@@ -46,12 +49,12 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <button
-            onClick={() => handleNavClick('Главная')}
+          <Link
+            href="/"
             className="text-slate-300 hover:text-white transition-colors text-sm font-medium"
           >
             Главная
-          </button>
+          </Link>
           <button
             onClick={() => handleNavClick('Курсы')}
             className="text-slate-300 hover:text-white transition-colors text-sm font-medium"
@@ -68,12 +71,12 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
             </button>
             {isToolsDropdownOpen && (
               <div className="absolute top-full left-0 mt-2 bg-slate-900 border border-white/10 rounded-lg shadow-xl min-w-48 py-2">
-                <button
-                  onClick={() => handleToolsClick('Тюнер')}
+                <Link
+                  href="/tuner"
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Тюнер
-                </button>
+                </Link>
                 <button
                   onClick={() => handleToolsClick('Метроном')}
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
@@ -92,12 +95,12 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                 >
                   Генератор аккордов
                 </button>
-                <button
-                  onClick={() => handleToolsClick('Музыкальный диктант')}
+                <Link
+                  href="/dictation"
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Музыкальный диктант
-                </button>
+                </Link>
               </div>
             )}
           </div>
@@ -113,8 +116,8 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
           >
             Табы
           </button>
-          <button
-            onClick={handleOpenTuner}
+          <Link
+            href="/tuner"
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors ml-4"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -123,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
             Тюнер
-          </button>
+          </Link>
         </nav>
 
         {/* Mobile menu button */}
@@ -139,12 +142,12 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
       {isMobileMenuOpen && (
         <div className="md:hidden mt-4 pt-4 border-t border-white/10">
           <nav className="flex flex-col gap-4">
-            <button
-              onClick={() => handleNavClick('Главная')}
+            <Link
+              href="/"
               className="text-slate-300 hover:text-white transition-colors text-sm font-medium text-left"
             >
               Главная
-            </button>
+            </Link>
             <button
               onClick={() => handleNavClick('Курсы')}
               className="text-slate-300 hover:text-white transition-colors text-sm font-medium text-left"
@@ -161,12 +164,12 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
               </button>
               {isToolsDropdownOpen && (
                 <div className="mt-2 ml-4 space-y-2">
-                  <button
-                    onClick={() => handleToolsClick('Тюнер')}
+                  <Link
+                    href="/tuner"
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Тюнер
-                  </button>
+                  </Link>
                   <button
                     onClick={() => handleToolsClick('Метроном')}
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
@@ -185,12 +188,12 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                   >
                     Генератор аккордов
                   </button>
-                  <button
-                    onClick={() => handleToolsClick('Музыкальный диктант')}
+                  <Link
+                    href="/dictation"
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Музыкальный диктант
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>
@@ -206,8 +209,8 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
             >
               Табы
             </button>
-            <button
-              onClick={handleOpenTuner}
+            <Link
+              href="/tuner"
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -216,7 +219,7 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
               Тюнер
-            </button>
+            </Link>
           </nav>
         </div>
       )}

@@ -1,9 +1,20 @@
 import React from 'react';
-import { useAppSelector } from '../../../store/hooks';
 
-export const TunerDisplay: React.FC = () => {
-  const { currentNote, currentFrequency, currentDetune, pointerPosition, isInTune } = useAppSelector(state => state.tuner);
+interface TunerDisplayProps {
+  currentNote: string;
+  currentFrequency: number;
+  currentDetune: number;
+  pointerPosition: number;
+  isInTune: boolean;
+}
 
+export const TunerDisplay: React.FC<TunerDisplayProps> = ({
+  currentNote,
+  currentFrequency,
+  currentDetune,
+  pointerPosition,
+  isInTune
+}) => {
   return (
     <div className="flex flex-col items-center">
       {/* Нота */}

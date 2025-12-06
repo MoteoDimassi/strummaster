@@ -9,7 +9,7 @@ import {
   PlaybackStrategyFactoryAdapter,
   AudioEventBusAdapter,
   AudioEngineCore
-} from '../audio/AudioEngineCore';
+} from '../../shared/lib/audio/AudioEngineCore';
 import { audioSampleFactory } from '../../shared/utils/AudioSampleFactory';
 import { PlaybackStrategyFactory } from '../../shared/utils/PlaybackStrategies';
 import { audioEventBus } from '../../shared/utils/AudioEventBus';
@@ -19,6 +19,10 @@ let audioContext: AudioContext | null = null;
 
 // Инициализация AudioContext
 function getAudioContext(): AudioContext {
+  if (typeof window === 'undefined') {
+    throw new Error('AudioContext is not available on the server');
+  }
+  
   if (!audioContext) {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContextClass) {
@@ -52,6 +56,10 @@ let masterGainNode: GainNode | null = null;
 
 // Инициализация Master Gain Node
 function getMasterGainNode(): GainNode {
+  if (typeof window === 'undefined') {
+    throw new Error('GainNode is not available on the server');
+  }
+
   if (!masterGainNode) {
     const context = getAudioContext();
     masterGainNode = context.createGain();
@@ -264,6 +272,8 @@ export class AudioEngineAdapter {
 
   constructor() {
     // Создаем экземпляр AudioEngineCore с адаптерами
+    // В SSR среде адаптеры будут созданы, но методы, требующие window, будут выбрасывать ошибки при вызове
+    // Это нормально, так как мы не должны вызывать аудио методы на сервере
     this.audioEngineCore = new AudioEngineCore(
       new WebAudioContextAdapter(),
       new WebGainNodeAdapter(),
