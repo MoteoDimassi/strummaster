@@ -53,6 +53,12 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
             Главная
           </Link>
           <Link
+            to="/trainer"
+            className="text-slate-300 hover:text-white transition-colors text-sm font-medium"
+          >
+            Тренажер
+          </Link>
+          <Link
             to="/courses"
             className="text-slate-300 hover:text-white transition-colors text-sm font-medium"
           >
@@ -81,20 +87,6 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Метроном
-                </Link>
-                <Link
-                  to="/chord-analyzer"
-                  onClick={() => setIsToolsDropdownOpen(false)}
-                  className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                >
-                  Анализатор аккордов
-                </Link>
-                <Link
-                  to="/chord-generator"
-                  onClick={() => setIsToolsDropdownOpen(false)}
-                  className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                >
-                  Генератор аккордов
                 </Link>
                 <Link
                   to="/dictation"
@@ -152,6 +144,13 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
               Главная
             </Link>
             <Link
+              to="/trainer"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-slate-300 hover:text-white transition-colors text-sm font-medium text-left"
+            >
+              Тренажер
+            </Link>
+            <Link
               to="/courses"
               onClick={() => setIsMobileMenuOpen(false)}
               className="text-slate-300 hover:text-white transition-colors text-sm font-medium text-left"
@@ -181,20 +180,6 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Метроном
-                  </Link>
-                  <Link
-                    to="/chord-analyzer"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
-                  >
-                    Анализатор аккордов
-                  </Link>
-                  <Link
-                    to="/chord-generator"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
-                  >
-                    Генератор аккордов
                   </Link>
                   <Link
                     to="/dictation"
