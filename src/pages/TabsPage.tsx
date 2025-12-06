@@ -1,5 +1,17 @@
-import React, { useState } from 'react';
-import { Search, Music, Clock, Star, Filter, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Music, Clock, Star, Filter, ChevronDown, Loader2 } from 'lucide-react';
+
+// Типы данных для табулатур из API Strapi
+interface TabData {
+  documentId: string;
+  Name: string;
+  Description: string;
+  Image?: {
+    url: string;
+    alternativeText?: string;
+  };
+  [key: string]: any; // Для дополнительных полей
+}
 
 export const TabsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -7,79 +19,38 @@ export const TabsPage: React.FC = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState('Любая сложность');
   const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
   const [isDifficultyDropdownOpen, setIsDifficultyDropdownOpen] = useState(false);
+  const [tabs, setTabs] = useState<TabData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Моковые данные для табулатур
-  const tabs = [
-    {
-      id: 1,
-      title: "Stairway to Heaven",
-      artist: "Led Zeppelin",
-      genre: "Рок",
-      difficulty: "Средний",
-      duration: "8:02",
-      rating: 4.9,
-      views: 15420,
-      tuning: "Standard (EADGBE)"
-    },
-    {
-      id: 2,
-      title: "Blackbird",
-      artist: "The Beatles",
-      genre: "Поп-рок",
-      difficulty: "Средний",
-      duration: "2:18",
-      rating: 4.8,
-      views: 12350,
-      tuning: "Standard (EADGBE)"
-    },
-    {
-      id: 3,
-      title: "Dust in the Wind",
-      artist: "Kansas",
-      genre: "Фолк-рок",
-      difficulty: "Начальный",
-      duration: "3:27",
-      rating: 4.7,
-      views: 18930,
-      tuning: "Standard (EADGBE)"
-    },
-    {
-      id: 4,
-      title: "Hotel California",
-      artist: "Eagles",
-      genre: "Рок",
-      difficulty: "Продвинутый",
-      duration: "6:30",
-      rating: 4.9,
-      views: 22150,
-      tuning: "Standard (EADGBE)"
-    },
-    {
-      id: 5,
-      title: "Wonderwall",
-      artist: "Oasis",
-      genre: "Поп-рок",
-      difficulty: "Начальный",
-      duration: "4:18",
-      rating: 4.6,
-      views: 25780,
-      tuning: "Standard (EADGBE)"
-    },
-    {
-      id: 6,
-      title: "Classical Gas",
-      artist: "Mason Williams",
-      genre: "Классика",
-      difficulty: "Продвинутый",
-      duration: "3:05",
-      rating: 4.8,
-      views: 8920,
-      tuning: "Standard (EADGBE)"
-    }
-  ];
+  // Загрузка данных из API Strapi
+  useEffect(() => {
+    const fetchTabs = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('http://localhost:1337/api/tabs');
+        
+        if (!response.ok) {
+          throw new Error(`Ошибка загрузки: ${response.status}`);
+        }
+        
+        const { data } = await response.json();
+        setTabs(data || []);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Произошла ошибка при загрузке данных');
+        console.error('Ошибка при загрузке табулатур:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const genres = ['Все жанры', 'Рок', 'Поп-рок', 'Фолк-рок', 'Классика', 'Джаз', 'Блюз'];
-  const difficulties = ['Любая сложность', 'Начальный', 'Средний', 'Продвинутый'];
+    fetchTabs();
+  }, []);
+
+  // Получаем уникальные жанры из данных (предполагаем, что есть поле Genre)
+  const genres = ['Все жанры', ...new Set(tabs.map(tab => tab.Genre).filter(Boolean))];
+  const difficulties = ['Любая сложность', ...new Set(tabs.map(tab => tab.Difficulty).filter(Boolean))];
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -95,10 +66,10 @@ export const TabsPage: React.FC = () => {
   };
 
   const filteredTabs = tabs.filter(tab => {
-    const matchesSearch = tab.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         tab.artist.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesGenre = selectedGenre === 'Все жанры' || tab.genre === selectedGenre;
-    const matchesDifficulty = selectedDifficulty === 'Любая сложность' || tab.difficulty === selectedDifficulty;
+    const matchesSearch = tab.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         tab.Description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesGenre = selectedGenre === 'Все жанры' || tab.Genre === selectedGenre;
+    const matchesDifficulty = selectedDifficulty === 'Любая сложность' || tab.Difficulty === selectedDifficulty;
     
     return matchesSearch && matchesGenre && matchesDifficulty;
   });
@@ -187,57 +158,97 @@ export const TabsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Список табулатур */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredTabs.map((tab) => (
-            <div 
-              key={tab.id} 
-              className="bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-800 p-6 hover:border-amber-600/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/10"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-white mb-1">{tab.title}</h3>
-                  <p className="text-slate-400">{tab.artist}</p>
-                </div>
-                <div className="flex items-center gap-1 text-yellow-500">
-                  <Star size={16} fill="currentColor" />
-                  <span className="text-white text-sm">{tab.rating}</span>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                  {tab.genre}
-                </span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(tab.difficulty)}`}>
-                  {tab.difficulty}
-                </span>
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                  {tab.tuning}
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <Clock size={14} />
-                    <span>{tab.duration}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Music size={14} />
-                    <span>{tab.views.toLocaleString()} просмотров</span>
-                  </div>
-                </div>
-              </div>
-              
-              <button className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02]">
-                Открыть табулатуру
+        {/* Состояние загрузки */}
+        {isLoading && (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="animate-spin text-amber-500 mr-3" size={24} />
+            <span className="text-slate-400">Загрузка табулатур...</span>
+          </div>
+        )}
+
+        {/* Состояние ошибки */}
+        {error && (
+          <div className="text-center py-12">
+            <div className="bg-red-900/20 border border-red-800 rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-xl font-semibold text-red-400 mb-2">Ошибка загрузки</h3>
+              <p className="text-slate-400 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Попробовать снова
               </button>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
-        {filteredTabs.length === 0 && (
+        {/* Список табулатур */}
+        {!isLoading && !error && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredTabs.map((tab) => (
+              <div
+                key={tab.documentId}
+                className="bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-800 p-6 hover:border-amber-600/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/10"
+              >
+                {/* Изображение */}
+                {tab.Image?.url && (
+                  <div className="mb-4 rounded-lg overflow-hidden">
+                    <img
+                      src={`http://localhost:1337${tab.Image.url}`}
+                      alt={tab.Image.alternativeText || tab.Name || 'Изображение табулатуры'}
+                      className="w-full h-48 object-cover"
+                    />
+                  </div>
+                )}
+                
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold text-white mb-1">{tab.Name || 'Без названия'}</h3>
+                    <div
+                      className="text-slate-400 prose prose-invert prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: tab.Description || 'Нет описания' }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1 text-yellow-500 ml-4">
+                    <Star size={16} fill="currentColor" />
+                    <span className="text-white text-sm">{tab.Rating || '0'}</span>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                    {tab.Genre || 'Не указан'}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(tab.Difficulty || '')}`}>
+                    {tab.Difficulty || 'Не указана'}
+                  </span>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                    {tab.Tuning || 'Standard (EADGBE)'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <Clock size={14} />
+                      <span>{tab.Duration || '0:00'}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Music size={14} />
+                      <span>{(tab.Views || 0).toLocaleString()} просмотров</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <button className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02]">
+                  Открыть табулатуру
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!isLoading && !error && filteredTabs.length === 0 && (
           <div className="text-center py-12">
             <Music className="mx-auto text-slate-600 mb-4" size={48} />
             <h3 className="text-xl font-semibold text-white mb-2">Табулатуры не найдены</h3>
@@ -245,17 +256,27 @@ export const TabsPage: React.FC = () => {
           </div>
         )}
 
-        <div className="mt-12 text-center">
-          <div className="bg-slate-900/30 backdrop-blur-sm rounded-xl border border-slate-800 p-8">
-            <h2 className="text-2xl font-semibold mb-4">Не нашли нужную табулатуру?</h2>
-            <p className="text-slate-400 mb-6">
-              Наша коллекция постоянно пополняется. Вы можете запросить добавление конкретной композиции.
-            </p>
-            <button className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-              Запросить табулатуру
-            </button>
+        {!isLoading && !error && (
+          <div className="mt-12 text-center">
+            <div className="bg-slate-900/30 backdrop-blur-sm rounded-xl border border-slate-800 p-8">
+              <h2 className="text-2xl font-semibold mb-4">Не нашли нужную табулатуру?</h2>
+              <p className="text-slate-400 mb-6">
+                Наша коллекция постоянно пополняется из базы данных Strapi. Вы можете запросить добавление конкретной композиции.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                  Запросить табулатуру
+                </button>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                >
+                  Обновить данные
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
