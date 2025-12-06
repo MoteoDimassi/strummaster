@@ -1,3 +1,4 @@
+@import "tailwindcss";
 /* Дополнительные стили для StrumMaster */
 
 /* Убираем ограничение ширины для всего приложения */
@@ -156,11 +157,13 @@ footer .border {
 }
 
 /* Улучшенные стили для навигационных ссылок */
-header button:not(.md\\:hidden):not(.bg-slate-800) {
+header nav a,
+header nav button:not(.bg-blue-600) {
   position: relative;
 }
 
-header button:not(.md\\:hidden):not(.bg-slate-800)::after {
+header nav a::after,
+header nav button:not(.bg-blue-600)::after {
   content: "";
   position: absolute;
   width: 0;
@@ -171,7 +174,8 @@ header button:not(.md\\:hidden):not(.bg-slate-800)::after {
   transition: all 0.3s ease;
 }
 
-header button:not(.md\\:hidden):not(.bg-slate-800):hover::after {
+header nav a:hover::after,
+header nav button:not(.bg-blue-600):hover::after {
   width: 100%;
   left: 0;
 }

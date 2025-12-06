@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Music, Volume2, ChevronDown, Menu, X } from 'lucide-react';
 import { useAppDispatch } from '../../store/hooks';
 import { openTuner } from '../../store/slices/tunerSlice';
@@ -11,16 +12,15 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
   const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  const handleNavClick = (item: string) => {
-    console.log(`Нажато на: ${item}`);
-    if (onToolSelect) onToolSelect(item); // Reset tool selection if navigating away
+  const handleNavClick = (path: string) => {
+    navigate(path);
     setIsMobileMenuOpen(false);
   };
 
-  const handleToolsClick = (tool: string) => {
-    console.log(`Выбран инструмент: ${tool}`);
-    if (onToolSelect) onToolSelect(tool);
+  const handleToolsClick = (path: string) => {
+    navigate(path);
     setIsToolsDropdownOpen(false);
     setIsMobileMenuOpen(false);
   };
@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
   return (
     <header className="bg-slate-950/50 backdrop-blur-md border-b border-white/10 p-4 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3">
           <div className="bg-gradient-to-br from-amber-400 to-orange-600 p-2 rounded-lg shadow-lg shadow-orange-500/20">
             <Music className="text-white" size={24} />
           </div>
@@ -42,22 +42,22 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
             </h1>
             <p className="text-xs text-slate-500 font-medium">Guitar Rhythm Trainer</p>
           </div>
-        </div>
+        </Link>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <button
-            onClick={() => handleNavClick('Главная')}
+          <Link
+            to="/"
             className="text-slate-300 hover:text-white transition-colors text-sm font-medium"
           >
             Главная
-          </button>
-          <button
-            onClick={() => handleNavClick('Курсы')}
+          </Link>
+          <Link
+            to="/courses"
             className="text-slate-300 hover:text-white transition-colors text-sm font-medium"
           >
             Курсы
-          </button>
+          </Link>
           <div className="relative">
             <button
               onClick={() => setIsToolsDropdownOpen(!isToolsDropdownOpen)}
@@ -68,51 +68,56 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
             </button>
             {isToolsDropdownOpen && (
               <div className="absolute top-full left-0 mt-2 bg-slate-900 border border-white/10 rounded-lg shadow-xl min-w-48 py-2">
-                <button
-                  onClick={() => handleToolsClick('Тюнер')}
+                <Link
+                  to="/tuner"
+                  onClick={() => setIsToolsDropdownOpen(false)}
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Тюнер
-                </button>
-                <button
-                  onClick={() => handleToolsClick('Метроном')}
+                </Link>
+                <Link
+                  to="/metronome"
+                  onClick={() => setIsToolsDropdownOpen(false)}
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Метроном
-                </button>
-                <button
-                  onClick={() => handleToolsClick('Анализатор аккордов')}
+                </Link>
+                <Link
+                  to="/chord-analyzer"
+                  onClick={() => setIsToolsDropdownOpen(false)}
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Анализатор аккордов
-                </button>
-                <button
-                  onClick={() => handleToolsClick('Генератор аккордов')}
+                </Link>
+                <Link
+                  to="/chord-generator"
+                  onClick={() => setIsToolsDropdownOpen(false)}
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Генератор аккордов
-                </button>
-                <button
-                  onClick={() => handleToolsClick('Музыкальный диктант')}
+                </Link>
+                <Link
+                  to="/dictation"
+                  onClick={() => setIsToolsDropdownOpen(false)}
                   className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Музыкальный диктант
-                </button>
+                </Link>
               </div>
             )}
           </div>
-          <button
-            onClick={() => handleNavClick('Блог')}
+          <Link
+            to="/blog"
             className="text-slate-300 hover:text-white transition-colors text-sm font-medium"
           >
             Блог
-          </button>
-          <button
-            onClick={() => handleNavClick('Табы')}
+          </Link>
+          <Link
+            to="/tabs"
             className="text-slate-300 hover:text-white transition-colors text-sm font-medium"
           >
             Табы
-          </button>
+          </Link>
           <button
             onClick={handleOpenTuner}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors ml-4"
@@ -139,18 +144,20 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
       {isMobileMenuOpen && (
         <div className="md:hidden mt-4 pt-4 border-t border-white/10">
           <nav className="flex flex-col gap-4">
-            <button
-              onClick={() => handleNavClick('Главная')}
+            <Link
+              to="/"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-slate-300 hover:text-white transition-colors text-sm font-medium text-left"
             >
               Главная
-            </button>
-            <button
-              onClick={() => handleNavClick('Курсы')}
+            </Link>
+            <Link
+              to="/courses"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-slate-300 hover:text-white transition-colors text-sm font-medium text-left"
             >
               Курсы
-            </button>
+            </Link>
             <div>
               <button
                 onClick={() => setIsToolsDropdownOpen(!isToolsDropdownOpen)}
@@ -161,51 +168,58 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
               </button>
               {isToolsDropdownOpen && (
                 <div className="mt-2 ml-4 space-y-2">
-                  <button
-                    onClick={() => handleToolsClick('Тюнер')}
+                  <Link
+                    to="/tuner"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Тюнер
-                  </button>
-                  <button
-                    onClick={() => handleToolsClick('Метроном')}
+                  </Link>
+                  <Link
+                    to="/metronome"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Метроном
-                  </button>
-                  <button
-                    onClick={() => handleToolsClick('Анализатор аккордов')}
+                  </Link>
+                  <Link
+                    to="/chord-analyzer"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Анализатор аккордов
-                  </button>
-                  <button
-                    onClick={() => handleToolsClick('Генератор аккордов')}
+                  </Link>
+                  <Link
+                    to="/chord-generator"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Генератор аккордов
-                  </button>
-                  <button
-                    onClick={() => handleToolsClick('Музыкальный диктант')}
+                  </Link>
+                  <Link
+                    to="/dictation"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="block w-full text-left text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     Музыкальный диктант
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>
-            <button
-              onClick={() => handleNavClick('Блог')}
+            <Link
+              to="/blog"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-slate-300 hover:text-white transition-colors text-sm font-medium text-left"
             >
               Блог
-            </button>
-            <button
-              onClick={() => handleNavClick('Табы')}
+            </Link>
+            <Link
+              to="/tabs"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-slate-300 hover:text-white transition-colors text-sm font-medium text-left"
             >
               Табы
-            </button>
+            </Link>
             <button
               onClick={handleOpenTuner}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
