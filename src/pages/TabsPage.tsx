@@ -3,22 +3,48 @@ import { Search, Music, Clock, Star, Filter, ChevronDown, Loader2 } from 'lucide
 
 // Типы данных для табулатур из API Strapi
 interface TabData {
+  id: number;
   documentId: string;
   Name: string;
   Description: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  // Поддерживаем разные форматы изображений из Strapi (когда будут добавлены)
   Image?: {
     url: string;
     alternativeText?: string;
+    data?: {
+      attributes?: {
+        url: string;
+        alternativeText?: string;
+      };
+    };
   };
+  image?: {
+    url: string;
+    alternativeText?: string;
+    data?: {
+      attributes?: {
+        url: string;
+        alternativeText?: string;
+      };
+    };
+  };
+  // Другие поля, которые могут быть добавлены в будущем
+  Genre?: string;
+  Tuning?: string;
+  Duration?: string;
+  Views?: number;
+  Difficulty?: string;
+  Rating?: number;
   [key: string]: any; // Для дополнительных полей
 }
 
 export const TabsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('Все жанры');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('Любая сложность');
   const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
-  const [isDifficultyDropdownOpen, setIsDifficultyDropdownOpen] = useState(false);
   const [tabs, setTabs] = useState<TabData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,14 +54,20 @@ export const TabsPage: React.FC = () => {
     const fetchTabs = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:1337/api/tabs');
+        // Запрос с параметрами для получения всех полей
+        const response = await fetch('http://localhost:1337/api/tabs?populate=*');
         
         if (!response.ok) {
           throw new Error(`Ошибка загрузки: ${response.status}`);
         }
         
-        const { data } = await response.json();
-        setTabs(data || []);
+        const result = await response.json();
+        console.log('Загруженные данные из Strapi:', result);
+        // Если есть хотя бы один элемент, выводим его структуру для отладки
+        if (result.data && result.data.length > 0) {
+          console.log('Структура первого элемента:', result.data[0]);
+        }
+        setTabs(result.data || []);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Произошла ошибка при загрузке данных');
@@ -50,28 +82,13 @@ export const TabsPage: React.FC = () => {
 
   // Получаем уникальные жанры из данных (предполагаем, что есть поле Genre)
   const genres = ['Все жанры', ...new Set(tabs.map(tab => tab.Genre).filter(Boolean))];
-  const difficulties = ['Любая сложность', ...new Set(tabs.map(tab => tab.Difficulty).filter(Boolean))];
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "Начальный":
-        return "bg-green-900/30 text-green-400 border-green-800";
-      case "Средний":
-        return "bg-yellow-900/30 text-yellow-400 border-yellow-800";
-      case "Продвинутый":
-        return "bg-red-900/30 text-red-400 border-red-800";
-      default:
-        return "bg-gray-900/30 text-gray-400 border-gray-800";
-    }
-  };
 
   const filteredTabs = tabs.filter(tab => {
     const matchesSearch = tab.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          tab.Description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesGenre = selectedGenre === 'Все жанры' || tab.Genre === selectedGenre;
-    const matchesDifficulty = selectedDifficulty === 'Любая сложность' || tab.Difficulty === selectedDifficulty;
     
-    return matchesSearch && matchesGenre && matchesDifficulty;
+    return matchesSearch && matchesGenre;
   });
 
   return (
@@ -128,32 +145,6 @@ export const TabsPage: React.FC = () => {
                 )}
               </div>
               
-              <div className="relative">
-                <button
-                  onClick={() => setIsDifficultyDropdownOpen(!isDifficultyDropdownOpen)}
-                  className="flex items-center gap-2 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white hover:bg-slate-700 transition-colors"
-                >
-                  <Filter size={16} />
-                  {selectedDifficulty}
-                  <ChevronDown size={16} className={`transition-transform ${isDifficultyDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-                {isDifficultyDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-40 z-10">
-                    {difficulties.map((difficulty) => (
-                      <button
-                        key={difficulty}
-                        onClick={() => {
-                          setSelectedDifficulty(difficulty);
-                          setIsDifficultyDropdownOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
-                      >
-                        {difficulty}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
@@ -190,53 +181,83 @@ export const TabsPage: React.FC = () => {
                 key={tab.documentId}
                 className="bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-800 p-6 hover:border-amber-600/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/10"
               >
-                {/* Изображение */}
-                {tab.Image?.url && (
+                {/* Изображение - заглушка на будущее, когда будут добавлены изображения в Strapi */}
+                {(tab.Image?.url || tab.image?.url || tab.Image?.data?.attributes?.url || tab.image?.data?.attributes?.url) ? (
                   <div className="mb-4 rounded-lg overflow-hidden">
                     <img
-                      src={`http://localhost:1337${tab.Image.url}`}
-                      alt={tab.Image.alternativeText || tab.Name || 'Изображение табулатуры'}
+                      src={
+                        // Обрабатываем различные форматы данных изображений из Strapi
+                        (tab.Image?.url || tab.image?.url || tab.Image?.data?.attributes?.url || tab.image?.data?.attributes?.url)?.startsWith('http')
+                          ? (tab.Image?.url || tab.image?.url || tab.Image?.data?.attributes?.url || tab.image?.data?.attributes?.url)
+                          : `http://localhost:1337${tab.Image?.url || tab.image?.url || tab.Image?.data?.attributes?.url || tab.image?.data?.attributes?.url}`
+                      }
+                      alt={
+                        tab.Image?.alternativeText ||
+                        tab.image?.alternativeText ||
+                        tab.Image?.data?.attributes?.alternativeText ||
+                        tab.image?.data?.attributes?.alternativeText ||
+                        tab.Name ||
+                        'Изображение табулатуры'
+                      }
                       className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        console.error('Ошибка загрузки изображения:', {
+                          Image: tab.Image,
+                          image: tab.image,
+                          url: tab.Image?.url || tab.image?.url || tab.Image?.data?.attributes?.url || tab.image?.data?.attributes?.url
+                        });
+                      }}
                     />
+                  </div>
+                ) : (
+                  <div className="mb-4 rounded-lg overflow-hidden bg-slate-800 h-48 flex items-center justify-center">
+                    <Music size={48} className="text-slate-600" />
                   </div>
                 )}
                 
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-white mb-1">{tab.Name || 'Без названия'}</h3>
-                    <div
-                      className="text-slate-400 prose prose-invert prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: tab.Description || 'Нет описания' }}
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 text-yellow-500 ml-4">
-                    <Star size={16} fill="currentColor" />
-                    <span className="text-white text-sm">{tab.Rating || '0'}</span>
+                <div className="mb-4">
+                  <h3 className="text-xl font-semibold text-white mb-3">{tab.Name || 'Без названия'}</h3>
+                  <div
+                    className="text-slate-400 prose prose-invert prose-sm max-w-none mb-3"
+                    dangerouslySetInnerHTML={{ __html: tab.Description || 'Нет описания' }}
+                  />
+                  <div className="text-xs text-slate-500">
+                    Добавлено: {new Date(tab.createdAt).toLocaleDateString('ru-RU')}
                   </div>
                 </div>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                    {tab.Genre || 'Не указан'}
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(tab.Difficulty || '')}`}>
-                    {tab.Difficulty || 'Не указана'}
-                  </span>
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                    {tab.Tuning || 'Standard (EADGBE)'}
-                  </span>
+                  {tab.Genre && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                      {tab.Genre}
+                    </span>
+                  )}
+                  {tab.Tuning && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                      {tab.Tuning}
+                    </span>
+                  )}
+                  {tab.Duration && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                      {tab.Duration}
+                    </span>
+                  )}
                 </div>
                 
                 <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <Clock size={14} />
-                      <span>{tab.Duration || '0:00'}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Music size={14} />
-                      <span>{(tab.Views || 0).toLocaleString()} просмотров</span>
-                    </div>
+                    {tab.Duration && (
+                      <div className="flex items-center gap-1">
+                        <Clock size={14} />
+                        <span>{tab.Duration}</span>
+                      </div>
+                    )}
+                    {tab.Views && (
+                      <div className="flex items-center gap-1">
+                        <Music size={14} />
+                        <span>{tab.Views.toLocaleString()} просмотров</span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
