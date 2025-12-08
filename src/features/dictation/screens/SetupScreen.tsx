@@ -29,7 +29,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (settings.selectedOctaves.length === 0) {
-        alert("Please select at least one octave.");
+        alert("Пожалуйста, выберите хотя бы одну октаву.");
         return;
     }
     onStart(settings);
@@ -56,11 +56,11 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
   const ROOT_OPTIONS: NoteName[] = ['C', 'C#', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
   const DIFFICULTY_DESCRIPTIONS: Record<number, string> = {
-      1: 'Very Easy: Stepwise motion, short melody',
-      2: 'Easy: Small jumps, simple scale',
-      3: 'Medium: Perfect 5th jumps, limited replays',
-      4: 'Hard: Larger jumps, 2 octaves',
-      5: 'Expert: Full octave jumps, complex melody'
+      1: 'Очень легко: Поступенное движение, короткая мелодия',
+      2: 'Легко: Малые скачки, простая гамма',
+      3: 'Средне: Скачки на квинту, ограниченные повторы',
+      4: 'Сложно: Большие скачки, 2 октавы',
+      5: 'Эксперт: Скачки на полную октаву, сложная мелодия'
   };
 
   return (
@@ -69,14 +69,14 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
         <div className="p-3 bg-blue-600 rounded-lg text-white">
             <Music size={24} />
         </div>
-        <h1 className="text-2xl font-bold text-slate-800">New Dictation</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Новый диктант</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* Difficulty (Stars) */}
         <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Difficulty Level</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Уровень сложности</label>
             <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
@@ -107,7 +107,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
         {/* Basic Settings: Key & Scale */}
         <div className="grid grid-cols-2 gap-4">
             <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Root Note</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Тоника</label>
             <select 
                 className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 value={settings.rootNote}
@@ -120,14 +120,14 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
             </div>
 
             <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Scale Type</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Тип гаммы</label>
             <select 
                 className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 value={settings.scaleType}
                 onChange={(e) => setSettings({...settings, scaleType: e.target.value as ScaleType})}
             >
-                <option value="Major">Major</option>
-                <option value="Minor">Minor</option>
+                <option value="Major">Мажор</option>
+                <option value="Minor">Минор</option>
             </select>
             </div>
         </div>
@@ -140,7 +140,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
                 className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
             >
                 <Settings2 size={16} />
-                Advanced Settings
+                Дополнительные настройки
                 {showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
         </div>
@@ -150,15 +150,15 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
             <div className="space-y-5 bg-slate-50 p-4 rounded-xl border border-slate-200 animate-in fade-in slide-in-from-top-2">
                 {/* Replay Limit */}
                 <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Replay Limit</label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Лимит повторений</label>
                     <select 
                         className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                         value={settings.replayLimit}
                         onChange={(e) => setSettings({...settings, replayLimit: e.target.value === 'infinity' ? 'infinity' : Number(e.target.value)})}
                     >
-                        <option value="infinity">Unlimited</option>
+                        <option value="infinity">Без ограничений</option>
                         {[...Array(10)].map((_, i) => (
-                        <option key={i} value={i + 1}>{i + 1} Replays</option>
+                        <option key={i} value={i + 1}>{i + 1} повтор</option>
                         ))}
                     </select>
                 </div>
@@ -166,7 +166,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
                 <div className="grid grid-cols-2 gap-4">
                     {/* Scale Range */}
                     <div>
-                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Scale Degrees (3-7)</label>
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Ступени гаммы (3-7)</label>
                         <input 
                             type="number" min="3" max="7" 
                             className="w-full p-2 border border-slate-300 rounded-lg text-sm"
@@ -177,7 +177,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
 
                     {/* Melody Length */}
                     <div>
-                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Melody Length</label>
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Длина мелодии</label>
                         <input 
                             type="number" min="3" max="15" 
                             className="w-full p-2 border border-slate-300 rounded-lg text-sm"
@@ -189,7 +189,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
 
                 {/* Octave Selection */}
                 <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Octaves</label>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Октавы</label>
                     <div className="flex flex-wrap gap-2">
                         {[2, 3, 4, 5].map(oct => (
                             <button
@@ -215,7 +215,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
             className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-sm mt-4"
         >
             <Play size={20} />
-            Start Training
+            Начать тренировку
         </button>
       </form>
     </div>

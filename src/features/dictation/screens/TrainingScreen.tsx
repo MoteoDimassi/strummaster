@@ -40,12 +40,12 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
     setSelectedNoteId(null);
     setPlayCount(0);
     setFeedback('none');
-    setMessage(`Listen to the ${settings.melodyNoteCount}-note melody.`);
+    setMessage(`Прослушайте мелодию из ${settings.melodyNoteCount} нот.`);
   };
 
   const playMelody = async () => {
     if (settings.replayLimit !== 'infinity' && playCount >= settings.replayLimit) {
-        setMessage("Replay limit reached!");
+        setMessage("Достигнут лимит повторений!");
         return;
     }
 
@@ -77,7 +77,7 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
       
       // In write mode, only allow scale notes?
       if (!isScaleNote) {
-          setMessage("Note not in scale!");
+          setMessage("Нота не входит в гамму!");
           return; 
       }
 
@@ -126,7 +126,7 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
     setSelectedNoteId(null);
 
     if (userNotes.length !== targetMelody.length) {
-        setMessage(`Incorrect length. Expected ${targetMelody.length} notes.`);
+        setMessage(`Неверная длина. Ожидалось ${targetMelody.length} нот.`);
         setFeedback('error');
         setErrorCount(c => c + 1);
         return;
@@ -143,11 +143,11 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
 
     if (hasError) {
         setFeedback('error');
-        setMessage("Some notes are incorrect. Tap a red note to correct it.");
+        setMessage("Некоторые ноты неверны. Нажмите на красную ноту, чтобы исправить.");
         setErrorCount(c => c + 1);
     } else {
         setFeedback('success');
-        setMessage("Correct! Generating new melody...");
+        setMessage("Правильно! Генерирую новую мелодию...");
         setSuccessCount(c => c + 1);
         const winSequence = [523.25, 659.25, 783.99, 1046.50].map(f => ({frequency: f, duration: 0.1}));
         audioClient.playSequence(winSequence);
@@ -160,7 +160,7 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <button onClick={onBack} className="flex items-center text-slate-500 hover:text-slate-800 text-sm font-medium">
-            <ArrowLeft size={18} className="mr-1"/> Quit
+            <ArrowLeft size={18} className="mr-1"/> Выход
         </button>
         
         <div className="flex gap-3">
@@ -171,7 +171,7 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                  <X size={14} /> {errorCount}
              </div>
              <div className="bg-slate-200 px-3 py-1 rounded-full text-xs font-semibold text-slate-700">
-                Replays: {settings.replayLimit === 'infinity' ? playCount : `${playCount} / ${settings.replayLimit}`}
+                Повторы: {settings.replayLimit === 'infinity' ? playCount : `${playCount} / ${settings.replayLimit}`}
             </div>
         </div>
       </div>
@@ -190,14 +190,14 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                             : 'bg-blue-600 text-white hover:bg-blue-700'
                         }`}
                     >
-                        <Play size={18} /> Melody
+                        <Play size={18} /> Мелодия
                     </button>
                     
                     <button 
                         onClick={playScale}
                         className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium text-sm bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition-colors"
                     >
-                        <Music4 size={18} /> Scale
+                        <Music4 size={18} /> Гамма
                     </button>
                 </div>
             </div>
@@ -233,7 +233,7 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                         onClick={clearAllNotes}
                         className="flex items-center gap-1.5 px-3 py-2 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors text-xs font-medium"
                     >
-                        <RefreshCw size={14} /> Clear
+                        <RefreshCw size={14} /> Очистить
                     </button>
                     <button 
                         onClick={deleteSelectedNote}
@@ -244,7 +244,7 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                                 : 'text-slate-400 cursor-not-allowed'
                         }`}
                     >
-                        <Trash2 size={14} /> Delete
+                        <Trash2 size={14} /> Удалить
                     </button>
                 </div>
 
@@ -258,14 +258,14 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                         }`}
                     >
                         {inputMode === 'write' ? <Keyboard size={14}/> : <Volume2 size={14}/>}
-                        {inputMode === 'write' ? 'Write Mode' : 'Trial Mode'}
+                        {inputMode === 'write' ? 'Режим записи' : 'Пробный режим'}
                     </button>
 
                     <button 
                         onClick={checkSolution}
                         className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg text-sm font-semibold shadow-sm transition-transform active:scale-95"
                     >
-                        <Check size={16} /> Check
+                        <Check size={16} /> Проверить
                     </button>
                 </div>
              </div>
