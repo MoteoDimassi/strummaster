@@ -1,9 +1,15 @@
 import React from 'react';
 import { Star, Clock, Users, Award, Play, Check, Music, Calendar, MessageCircle } from 'lucide-react';
+import { SEO } from '../shared/components';
 
 export const LandingPage: React.FC = () => {
   return (
     <div className="w-full max-w-6xl mx-auto">
+      <SEO
+        title="Уроки гитары онлайн"
+        description="Профессиональные уроки игры на гитаре от Дмитрия. Индивидуальный подход, гибкий график, обучение с нуля до профи."
+        keywords="уроки гитары, обучение гитаре, репетитор по гитаре, гитара онлайн, курсы гитары"
+      />
       {/* Hero Section */}
       <section className="text-center py-12 md:py-20">
         <div className="max-w-4xl mx-auto">
