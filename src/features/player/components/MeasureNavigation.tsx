@@ -34,39 +34,39 @@ export const MeasureNavigation: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-800/50 p-4 rounded-xl border border-white/5">
+    <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
       
       {/* Navigation */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <button
           onClick={() => handleMeasureChange(-1)}
           disabled={activeMeasureIdx === 0}
-          className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-lg transition-colors"
+          className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 disabled:hover:bg-slate-100 rounded-xl transition-all active:scale-95"
         >
           <ChevronLeft size={20} />
         </button>
-        <div className="flex flex-col items-center px-4 min-w-[100px]">
-          <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">Такт</span>
-          <span className="text-2xl font-mono font-bold text-white">
-            {activeMeasureIdx + 1} <span className="text-slate-500 text-lg">/ {measures.length}</span>
+        <div className="flex flex-col items-center px-6 min-w-[120px]">
+          <span className="text-[11px] text-slate-400 uppercase tracking-widest font-bold mb-1">Такт</span>
+          <span className="text-3xl font-mono font-bold text-slate-900">
+            {activeMeasureIdx + 1} <span className="text-slate-300 text-xl font-normal">/ {measures.length}</span>
           </span>
         </div>
         <button
           onClick={() => handleMeasureChange(1)}
           disabled={activeMeasureIdx === measures.length - 1}
-          className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-lg transition-colors"
+          className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 disabled:hover:bg-slate-100 rounded-xl transition-all active:scale-95"
         >
           <ChevronRight size={20} />
         </button>
       </div>
 
       {/* Chord Editor */}
-      <div className="flex items-center gap-3">
-         <label className="text-sm text-slate-400 font-medium">Аккорд:</label>
+      <div className="flex items-center gap-4 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+         <label className="text-sm text-slate-500 font-medium">Аккорд:</label>
          <select
            value={currentChord}
            onChange={(e) => handleChordChange(e.target.value)}
-           className="bg-slate-900 border border-slate-700 text-amber-400 font-bold text-lg rounded-lg px-3 py-1 focus:ring-2 focus:ring-amber-500 outline-none"
+           className="bg-transparent text-blue-600 font-bold text-xl focus:outline-none cursor-pointer"
          >
            {['Am', 'A', 'C', 'G', 'D', 'Dm', 'E', 'Em', 'F'].map(c => (
              <option key={c} value={c}>{c}</option>
@@ -75,17 +75,17 @@ export const MeasureNavigation: React.FC = () => {
       </div>
 
       {/* Measure Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <button
           onClick={handleAddMeasure}
-          className="flex items-center gap-1 px-3 py-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg text-sm font-medium transition-colors border border-emerald-600/30"
+          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-xl text-sm font-semibold transition-colors border border-emerald-200/50"
          >
-           <Plus size={16} /> Добавить такт
+           <Plus size={18} /> Добавить
         </button>
         {measures.length > 1 && (
           <button
             onClick={handleRemoveMeasure}
-            className="p-2 bg-rose-900/20 hover:bg-rose-900/40 text-rose-400 rounded-lg transition-colors border border-rose-900/30"
+            className="p-2.5 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl transition-colors border border-rose-200/50"
             title="Удалить текущий такт"
           >
             <Trash2 size={18} />

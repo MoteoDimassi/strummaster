@@ -14,64 +14,59 @@ export const StrumNode: React.FC<StrumNodeProps> = ({ step, isActive, onClick, o
   
   // Helper to determine styles based on strum type
   const getStyles = () => {
-    if (isActive) return 'bg-amber-500 border-amber-400 text-white shadow-amber-500/50';
+    if (isActive) return 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/30 ring-4 ring-blue-100';
     
     switch (step.strumType) {
       case 'strum':
-        return 'bg-slate-700 border-slate-600 text-slate-200 group-hover:bg-slate-600';
+        return 'bg-slate-800 border-slate-700 text-white group-hover:bg-slate-700 group-hover:border-slate-600 shadow-md';
       case 'mute':
-        return 'bg-rose-900/40 border-rose-800 text-rose-400 group-hover:bg-rose-900/60';
+        return 'bg-rose-50 border-rose-200 text-rose-500 group-hover:bg-rose-100 group-hover:border-rose-300';
       case 'ghost':
       default:
-        return 'bg-slate-800/50 border-slate-700/50 text-slate-500 group-hover:bg-slate-800';
+        return 'bg-slate-50 border-slate-200 text-slate-300 group-hover:bg-slate-100 group-hover:border-slate-300';
     }
   };
 
   return (
-    <div className="strum-node flex flex-col items-center gap-2 group select-none">
+    <div className="strum-node flex flex-col items-center gap-3 group select-none">
       
       {/* Clickable Arrow Area */}
       <div
         onClick={onClick}
         className={`
           relative flex flex-col items-center justify-center gap-3 cursor-pointer
-          transition-all duration-200 ease-in-out
-          ${isActive ? 'scale-110 -translate-y-2' : 'hover:scale-105 hover:-translate-y-1'}
+          transition-all duration-200 ease-out
+          ${isActive ? 'scale-105 -translate-y-1' : 'hover:scale-105 hover:-translate-y-1'}
         `}
       >
         {/* Arrow Indicator */}
         <div
           className={`
-            w-16 h-24 rounded-2xl flex items-center justify-center shadow-lg border-2
-            transition-colors duration-150
+            w-14 h-20 md:w-16 md:h-24 rounded-2xl flex items-center justify-center border-2
+            transition-all duration-200
             ${getStyles()}
           `}
         >
           {isDown ? (
-            <ArrowDown size={48} strokeWidth={isActive ? 3 : 2} />
+            <ArrowDown size={40} strokeWidth={isActive ? 3 : 2.5} />
           ) : (
-            <ArrowUp size={48} strokeWidth={isActive ? 3 : 2} />
+            <ArrowUp size={40} strokeWidth={isActive ? 3 : 2.5} />
           )}
         </div>
 
         {/* Type Indicator */}
         <div
           className={`
-            transition-colors duration-200
-            ${isActive ? 'text-amber-400' :
-              step.strumType === 'strum' ? 'text-emerald-400' :
-              step.strumType === 'mute' ? 'text-rose-400' : 'text-slate-600'}
+            transition-colors duration-200 h-5 flex items-center justify-center
+            ${isActive ? 'text-blue-600' :
+              step.strumType === 'strum' ? 'text-slate-600' :
+              step.strumType === 'mute' ? 'text-rose-500' : 'text-slate-300'}
           `}
         >
-          {step.strumType === 'strum' && <CircleDot size={20} fill="currentColor" className="opacity-80" />}
-          {step.strumType === 'mute' && <X size={20} className="opacity-80" />}
-          {step.strumType === 'ghost' && <Circle size={20} className="opacity-50" />}
+          {step.strumType === 'strum' && <CircleDot size={18} className="opacity-100" />}
+          {step.strumType === 'mute' && <X size={18} className="opacity-100" />}
+          {step.strumType === 'ghost' && <Circle size={18} className="opacity-100" />}
         </div>
-
-        {/* Active Glow */}
-        {isActive && (
-          <div className="absolute inset-0 bg-amber-500/20 blur-xl rounded-full z-[-1]" />
-        )}
       </div>
 
       {/* Lyrics Input */}
@@ -82,9 +77,9 @@ export const StrumNode: React.FC<StrumNodeProps> = ({ step, isActive, onClick, o
           onChange={(e) => onLyricsChange(e.target.value)}
           placeholder="текст"
           className={`
-            w-full bg-transparent text-center text-sm border-b border-dashed focus:outline-none focus:border-amber-500
-            placeholder:text-slate-700
-            ${isActive ? 'text-amber-100 border-amber-500/50' : 'text-slate-300 border-slate-700'}
+            w-full bg-transparent text-center text-sm font-medium border-b border-transparent focus:outline-none focus:border-blue-500 transition-colors
+            placeholder:text-slate-300
+            ${isActive ? 'text-blue-700' : 'text-slate-600 hover:border-slate-300'}
           `}
         />
       </div>

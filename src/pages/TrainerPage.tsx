@@ -29,27 +29,29 @@ export const TrainerPage: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+    <div className="w-full max-w-5xl mx-auto pb-24 px-4">
+      <div className="text-center mb-10 mt-8">
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
           Тренировщик ритма
         </h1>
-        <p className="text-slate-300 text-lg">
-          Практикуйте игру на гитаре с различными ритмическими паттернами
+        <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+          Практикуйте игру на гитаре с различными ритмическими паттернами, создавайте свои ритмы и развивайте чувство времени
         </p>
       </div>
       
-      {/* Measure Navigation & Info */}
-      <MeasureNavigation />
+      <div className="space-y-6">
+        {/* Measure Navigation & Info */}
+        <MeasureNavigation />
 
-      {/* Pattern Controls */}
-      <PatternControls />
-      
-      {/* Visualizer Area */}
-      <StrumPattern />
+        {/* Pattern Controls */}
+        <PatternControls />
+        
+        {/* Visualizer Area */}
+        <StrumPattern />
 
-      {/* Controls */}
-      <PlayerControls />
+        {/* Controls */}
+        <PlayerControls />
+      </div>
     </div>
   );
 };

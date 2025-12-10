@@ -78,46 +78,32 @@ export const PlayerControls: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+    <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-8">
         
         {/* Play/Stop Button */}
         <button
           onClick={handleTogglePlay}
           className={`
-            flex items-center justify-center w-20 h-20 rounded-full shadow-lg transition-all duration-200
-            ${isPlaying 
-              ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/30' 
-              : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/30'
+            flex items-center justify-center w-16 h-16 rounded-full shadow-lg transition-all duration-200 hover:scale-105 active:scale-95
+            ${isPlaying
+              ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/30'
+              : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/30'
             }
           `}
         >
           {isPlaying ? (
-            <Square fill="white" className="text-white ml-0.5" size={32} />
+            <Square fill="white" className="text-white ml-0.5" size={24} />
           ) : (
-            <Play fill="white" className="text-white ml-1" size={36} />
+            <Play fill="white" className="text-white ml-1" size={28} />
           )}
         </button>
 
         {/* BPM Control */}
-        <div className="flex-1 w-full flex flex-col gap-2">
-          <div className="flex justify-between text-slate-300 font-medium">
-            <span>Темп</span>
-          </div>
-          <div className="flex gap-2 items-center">
-            <input
-              type="range"
-              min="35"
-              max="250"
-              value={bpm}
-              onChange={(e) => {
-                const newValue = Number(e.target.value);
-                handleBpmChange(newValue);
-                setTempBpm(newValue.toString());
-              }}
-              className="flex-1 h-3 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-amber-500"
-            />
-            <div className="flex items-center gap-1">
+        <div className="flex-1 w-full flex flex-col gap-3">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-700 font-semibold text-sm">Темп</span>
+            <div className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
               <input
                 type="text"
                 value={tempBpm}
@@ -156,40 +142,56 @@ export const PlayerControls: React.FC = () => {
                   e.target.select();
                   setTempBpm(bpm.toString());
                 }}
-                className="w-16 bg-slate-900 text-amber-400 font-mono text-sm rounded-lg px-2 py-1 border border-slate-700 focus:ring-2 focus:ring-amber-500 outline-none text-center"
+                className="w-10 bg-transparent text-slate-900 font-mono font-bold text-sm outline-none text-center"
               />
-              <span className="text-amber-400 font-mono text-sm">BPM</span>
+              <span className="text-slate-500 font-medium text-xs">BPM</span>
             </div>
           </div>
-          <div className="flex justify-between text-xs text-slate-500">
+          
+          <div className="relative h-6 flex items-center">
+            <input
+              type="range"
+              min="35"
+              max="250"
+              value={bpm}
+              onChange={(e) => {
+                const newValue = Number(e.target.value);
+                handleBpmChange(newValue);
+                setTempBpm(newValue.toString());
+              }}
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-700"
+            />
+          </div>
+          
+          <div className="flex justify-between text-[10px] text-slate-400 font-medium uppercase tracking-wider">
             <span>Медленно</span>
             <span>Быстро</span>
           </div>
         </div>
 
         {/* Separator */}
-        <div className="hidden md:block w-px h-16 bg-slate-700"></div>
+        <div className="hidden md:block w-px h-16 bg-slate-200"></div>
 
         {/* Length Controls */}
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-slate-300 text-sm font-medium">Длина</span>
-          <div className="flex items-center bg-slate-900 rounded-lg p-1 border border-slate-700">
-            <button 
+        <div className="flex flex-col items-center gap-3">
+          <span className="text-slate-700 text-sm font-semibold">Длина такта</span>
+          <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200">
+            <button
               onClick={() => handleStepCountChange(-2)}
               disabled={stepCount <= 4}
-              className="p-2 hover:bg-slate-700 rounded-md disabled:opacity-30 disabled:hover:bg-transparent text-slate-300 transition-colors"
+              className="p-2 hover:bg-white hover:shadow-sm rounded-lg disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:shadow-none text-slate-600 transition-all"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
             </button>
-            <span className="w-8 text-center font-mono font-bold text-lg text-slate-200">{stepCount}</span>
-             <button 
+            <span className="w-10 text-center font-mono font-bold text-lg text-slate-900">{stepCount}</span>
+             <button
               onClick={() => handleStepCountChange(2)}
               disabled={stepCount >= 16}
-              className="p-2 hover:bg-slate-700 rounded-md disabled:opacity-30 disabled:hover:bg-transparent text-slate-300 transition-colors"
+              className="p-2 hover:bg-white hover:shadow-sm rounded-lg disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:shadow-none text-slate-600 transition-all"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
@@ -198,9 +200,9 @@ export const PlayerControls: React.FC = () => {
         </div>
 
         {/* Reset */}
-        <button 
+        <button
           onClick={handleReset}
-          className="p-3 text-slate-400 hover:text-white hover:bg-slate-700 rounded-full transition-colors"
+          className="p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
           title="Сбросить паттерн"
         >
           <RotateCcw size={20} />
