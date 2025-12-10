@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import playerReducer from './slices/playerSlice';
 import tunerReducer from './slices/tunerSlice';
+import metronomeReducer from './slices/metronomeSlice';
 
 export const store = configureStore({
   reducer: {
     player: playerReducer,
     tuner: tunerReducer,
+    metronome: metronomeReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
