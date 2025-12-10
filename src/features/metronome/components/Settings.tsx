@@ -40,20 +40,20 @@ const Settings: React.FC = () => {
   return (
     <div className="w-full max-w-md mx-auto space-y-4">
       {/* Beats Selector */}
-      <div className="flex items-center justify-between py-3 border-b border-slate-100">
-        <span className="text-slate-600 text-lg font-medium">Биты</span>
+      <div className="flex items-center justify-between py-3 border-b border-border">
+        <span className="text-foreground text-lg font-medium">Биты</span>
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => dispatch(setBeatsPerBar(beatsPerBar - 1))}
-            className="text-slate-300 hover:text-slate-500 transition-colors active:scale-95"
+            className="text-muted-foreground hover:text-foreground transition-colors active:scale-95"
             disabled={beatsPerBar <= 1}
           >
             <MinusCircle size={32} strokeWidth={1.5} />
           </button>
-          <span className="text-2xl font-bold text-slate-800 w-8 text-center">{beatsPerBar}</span>
-          <button 
+          <span className="text-2xl font-bold text-foreground w-8 text-center">{beatsPerBar}</span>
+          <button
              onClick={() => dispatch(setBeatsPerBar(beatsPerBar + 1))}
-             className="text-slate-300 hover:text-slate-500 transition-colors active:scale-95"
+             className="text-muted-foreground hover:text-foreground transition-colors active:scale-95"
              disabled={beatsPerBar >= 16}
           >
             <PlusCircle size={32} strokeWidth={1.5} />
@@ -62,44 +62,44 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Accent Toggle */}
-      <div 
-        className="flex items-center justify-between py-3 border-b border-slate-100 cursor-pointer group" 
+      <div
+        className="flex items-center justify-between py-3 border-b border-border cursor-pointer group"
         onClick={() => dispatch(toggleAccent())}
       >
          <div className="flex items-center gap-3">
             <div className={`
               w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 border
-              ${accentFirstBeat 
-                ? 'bg-indigo-500 border-indigo-500' 
-                : 'bg-white border-slate-300 group-hover:border-indigo-300'
+              ${accentFirstBeat
+                ? 'bg-primary border-primary'
+                : 'bg-card border-border group-hover:border-primary'
               }
             `}>
-               {accentFirstBeat && <Check size={16} className="text-white" strokeWidth={3} />}
+               {accentFirstBeat && <Check size={16} className="text-primary-foreground" strokeWidth={3} />}
             </div>
-            <span className="text-slate-600 text-lg select-none group-hover:text-slate-800 transition-colors">Выделить первый бит</span>
+            <span className="text-foreground text-lg select-none group-hover:text-foreground transition-colors">Выделить первый бит</span>
          </div>
       </div>
 
       {/* Sound Selector */}
-      <div className="flex items-center justify-between py-3 border-b border-slate-100">
+      <div className="flex items-center justify-between py-3 border-b border-border">
          <div className="flex items-center gap-3">
-            <Music className="text-slate-400" size={20} />
-            <span className="text-slate-600 text-lg">Звук</span>
+            <Music className="text-muted-foreground" size={20} />
+            <span className="text-foreground text-lg">Звук</span>
          </div>
          
-         <div className="flex items-center bg-slate-50 rounded-lg p-1 border border-slate-100">
-            <button 
+         <div className="flex items-center bg-secondary rounded-lg p-1 border border-border">
+            <button
               onClick={() => cycleSound('prev')}
-              className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors hover:bg-white rounded-md active:scale-95"
+              className="p-1.5 text-muted-foreground hover:text-primary transition-colors hover:bg-card rounded-md active:scale-95"
             >
               <ChevronLeft size={18} />
             </button>
-            <span className="w-24 text-center font-medium text-slate-700 select-none text-sm">
+            <span className="w-24 text-center font-medium text-foreground select-none text-sm">
               {sounds[currentSoundIndex].label}
             </span>
-            <button 
+            <button
               onClick={() => cycleSound('next')}
-              className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors hover:bg-white rounded-md active:scale-95"
+              className="p-1.5 text-muted-foreground hover:text-primary transition-colors hover:bg-card rounded-md active:scale-95"
             >
               <ChevronRight size={18} />
             </button>
@@ -107,10 +107,10 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Volume Control */}
-      <div className="flex items-center justify-between py-3 border-b border-slate-100">
+      <div className="flex items-center justify-between py-3 border-b border-border">
          <div className="flex items-center gap-3">
-            <Volume2 className="text-slate-400" size={20} />
-            <span className="text-slate-600 text-lg">Громкость</span>
+            <Volume2 className="text-muted-foreground" size={20} />
+            <span className="text-foreground text-lg">Громкость</span>
          </div>
          
          <div className="flex items-center w-40 relative h-8">
@@ -125,16 +125,16 @@ const Settings: React.FC = () => {
             />
             
             {/* Track Background */}
-            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden absolute top-1/2 -translate-y-1/2 left-0">
-               <div 
-                  className="h-full bg-orange-400 transition-all duration-75 ease-out"
+            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden absolute top-1/2 -translate-y-1/2 left-0">
+               <div
+                  className="h-full bg-primary transition-all duration-75 ease-out"
                   style={{ width: `${volumePercent}%` }}
                />
             </div>
 
             {/* Thumb */}
-            <div 
-               className="absolute w-5 h-5 bg-orange-500 border-2 border-white rounded-full shadow-md pointer-events-none top-1/2 -translate-y-1/2 transition-all duration-75 ease-out"
+            <div
+               className="absolute w-5 h-5 bg-primary border-2 border-card rounded-full shadow-md pointer-events-none top-1/2 -translate-y-1/2 transition-all duration-75 ease-out"
                style={{ left: `calc(${volumePercent}% - 10px)` }}
             />
          </div>

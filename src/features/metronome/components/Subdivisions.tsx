@@ -5,8 +5,8 @@ import { setSubdivision } from '../../../store/slices/metronomeSlice';
 import { Rhythm } from '../types';
 
 // --- Shared Constants ---
-const COLOR_ACTIVE = "#ffffff";
-const COLOR_INACTIVE = "#1e293b"; // Slate-800
+const COLOR_ACTIVE = "var(--color-primary-foreground)";
+const COLOR_INACTIVE = "var(--color-foreground)";
 
 interface IconProps { active: boolean; }
 
@@ -175,7 +175,7 @@ const Subdivisions: React.FC = () => {
 
   return (
     <div className="mt-8">
-      <h3 className="text-slate-600 text-lg mb-4 text-left font-medium">Ритмы</h3>
+      <h3 className="text-foreground text-lg mb-4 text-left font-medium">Ритмы</h3>
       <div className="flex flex-wrap gap-4 justify-start">
         {options.map((opt) => {
            const isActive = currentSub === opt.value;
@@ -185,9 +185,9 @@ const Subdivisions: React.FC = () => {
                onClick={() => dispatch(setSubdivision(opt.value))}
                className={`
                  w-20 h-20 rounded-2xl flex items-center justify-center transition-all duration-200 border-2
-                 ${isActive 
-                    ? 'bg-orange-500 border-orange-500 shadow-md scale-105' 
-                    : 'bg-white border-slate-100 hover:border-orange-200 hover:bg-orange-50'
+                 ${isActive
+                    ? 'bg-primary border-primary shadow-md scale-105'
+                    : 'bg-card border-border hover:border-primary/50 hover:bg-secondary'
                  }
                `}
                title={opt.value}

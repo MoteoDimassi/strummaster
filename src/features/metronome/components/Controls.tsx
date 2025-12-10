@@ -49,8 +49,8 @@ const Controls: React.FC = () => {
       <button
         onClick={() => dispatch(togglePlay())}
         className={`
-          flex items-center justify-center gap-2 px-8 py-3 rounded-lg text-white font-semibold text-lg transition-all shadow-md active:scale-95
-          ${isPlaying ? 'bg-orange-500 hover:bg-orange-600' : 'bg-orange-400 hover:bg-orange-500'}
+          flex items-center justify-center gap-2 px-8 py-3 rounded-lg text-primary-foreground font-semibold text-lg transition-all shadow-md active:scale-95
+          ${isPlaying ? 'bg-primary hover:bg-primary/90' : 'bg-primary/80 hover:bg-primary'}
         `}
       >
         {isPlaying ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}
@@ -59,7 +59,7 @@ const Controls: React.FC = () => {
 
       <button
         onClick={handleTap}
-        className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-emerald-400 hover:bg-emerald-500 text-white font-semibold text-lg transition-all shadow-md active:scale-95"
+        className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-secondary hover:bg-secondary/80 text-foreground font-semibold text-lg transition-all shadow-md active:scale-95"
       >
         <MousePointerClick />
         Ручной Темп

@@ -29,22 +29,22 @@ const BpmControl: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center w-full mb-8">
-      <div className="bg-orange-100/50 text-slate-700 px-3 py-1 rounded-md text-sm font-medium mb-4">
+      <div className="bg-secondary text-foreground px-3 py-1 rounded-md text-sm font-medium mb-4">
         Ударов в Минуту
       </div>
       
-      <div className="text-[120px] leading-none font-bold text-slate-900 tracking-tighter">
+      <div className="text-[120px] leading-none font-bold text-foreground tracking-tighter">
         {bpm}
       </div>
       
-      <div className="text-slate-400 text-lg font-medium mb-8">
+      <div className="text-muted-foreground text-lg font-medium mb-8">
         {getTempoMarking(bpm)}
       </div>
 
       <div className="flex items-center w-full max-w-lg gap-6">
-        <button 
+        <button
           onClick={handleDecrease}
-          className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-slate-200 text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
+          className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors"
           aria-label="Decrease Tempo"
         >
           <Minus size={24} />
@@ -61,22 +61,22 @@ const BpmControl: React.FC = () => {
               className="w-full absolute z-10 opacity-0 cursor-pointer h-full"
             />
             {/* Visual Track */}
-            <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden relative">
-                 <div 
-                   className="h-full bg-orange-400 rounded-full" 
+            <div className="w-full h-2 bg-muted rounded-full overflow-hidden relative">
+                 <div
+                   className="h-full bg-primary rounded-full"
                    style={{ width: `${((bpm - 20) / (300 - 20)) * 100}%` }}
                  />
             </div>
             {/* Visual Thumb */}
-            <div 
-               className="absolute w-6 h-6 bg-orange-500 rounded-full shadow-md pointer-events-none"
+            <div
+               className="absolute w-6 h-6 bg-primary rounded-full shadow-md pointer-events-none"
                style={{ left: `calc(${((bpm - 20) / (300 - 20)) * 100}% - 12px)` }}
             />
         </div>
 
-        <button 
+        <button
           onClick={handleIncrease}
-          className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-slate-200 text-slate-400 hover:border-orange-400 hover:text-orange-500 transition-colors"
+          className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors"
           aria-label="Increase Tempo"
         >
           <Plus size={24} />

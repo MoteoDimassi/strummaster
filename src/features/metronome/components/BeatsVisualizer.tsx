@@ -19,9 +19,9 @@ const BeatsVisualizer: React.FC<BeatsVisualizerProps> = ({ currentBeat }) => {
             key={index}
             className={`
               transition-all duration-100 rounded-full
-              ${isActive 
-                ? 'w-6 h-6 bg-orange-500 shadow-lg shadow-orange-500/50 scale-110' 
-                : 'w-5 h-5 bg-slate-200'
+              ${isActive
+                ? 'w-6 h-6 bg-primary shadow-lg shadow-primary/50 scale-110'
+                : 'w-5 h-5 bg-muted-foreground/20'
               }
             `}
           />

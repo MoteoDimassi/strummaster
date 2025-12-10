@@ -10,8 +10,8 @@ export const MetronomePage: React.FC = () => {
   const { activeBeat } = useMetronome();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-950">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-2xl p-8 md:p-12 border border-slate-100 relative">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background-primary">
+      <div className="bg-background-secondary rounded-card shadow-card w-full max-w-2xl p-8 md:p-12 border border-border relative">
         
         {/* Top Tag */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -21,7 +21,7 @@ export const MetronomePage: React.FC = () => {
         <BpmControl />
         
         <div className="flex justify-center mb-6">
-           <div className="bg-orange-50 text-slate-500 text-xs font-bold px-3 py-1 uppercase tracking-widest rounded-md">
+           <div className="bg-background-surface-tinted text-text-secondary text-caption font-bold px-3 py-1 uppercase tracking-widest rounded-soft">
              Биты
            </div>
         </div>
@@ -30,7 +30,7 @@ export const MetronomePage: React.FC = () => {
         
         <Controls />
         
-        <hr className="border-slate-100 my-8" />
+        <hr className="border-border my-8" />
         
         <Settings />
         
