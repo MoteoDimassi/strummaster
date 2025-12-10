@@ -89,6 +89,13 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                   Метроном
                 </Link>
                 <Link
+                  to="/chord-trainer"
+                  onClick={() => setIsToolsDropdownOpen(false)}
+                  className="block w-full text-left px-4 py-2 text-body text-text-secondary hover:bg-background-surface-tinted hover:text-brand-blue transition-colors"
+                >
+                  Подбор аккордов
+                </Link>
+                <Link
                   to="/dictation"
                   onClick={() => setIsToolsDropdownOpen(false)}
                   className="block w-full text-left px-4 py-2 text-body text-text-secondary hover:bg-background-surface-tinted hover:text-brand-blue transition-colors"
@@ -180,6 +187,13 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                     className="block w-full text-left text-body text-text-secondary hover:text-brand-blue transition-colors"
                   >
                     Метроном
+                  </Link>
+                  <Link
+                    to="/chord-trainer"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block w-full text-left text-body text-text-secondary hover:text-brand-blue transition-colors"
+                  >
+                    Подбор аккордов
                   </Link>
                   <Link
                     to="/dictation"
