@@ -1,11 +1,11 @@
-import React from 'react';
-import { Star, Clock, Users, Award, Play, Check, Music, Calendar, MessageCircle, ArrowRight, Guitar } from 'lucide-react';
+import React, { useRef } from 'react';
+import { Star, Clock, Users, Award, Play, Check, Music, Calendar, MessageCircle, ArrowRight, Guitar, Mic, BookOpen, FileText, Activity } from 'lucide-react';
 import { SEO } from '../shared/components';
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/src/components/ui/card';
 import { Badge } from '@/src/components/ui/badge';
 import { Separator } from '@/src/components/ui/separator';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -30,18 +30,34 @@ const itemVariants = {
 };
 
 export const LandingPage: React.FC = () => {
+  const targetRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start start", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
   return (
-    <div className="w-full min-h-screen bg-background font-sans overflow-hidden">
+    <div className="w-full min-h-screen bg-background font-sans overflow-hidden" ref={targetRef}>
       <SEO
         title="Уроки гитары онлайн"
         description="Профессиональные уроки игры на гитаре от Дмитрия. Индивидуальный подход, гибкий график, обучение с нуля до профи."
         keywords="уроки гитары, обучение гитаре, репетитор по гитаре, гитара онлайн, курсы гитары"
       />
       
-      {/* Hero Section */}
-      <section className="relative w-full py-24 md:py-32 lg:py-40 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-transparent -z-10" />
-        <div className="container mx-auto px-4 md:px-6">
+      {/* Hero Section with Parallax */}
+      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+        <motion.div 
+          style={{ y, opacity }}
+          className="absolute inset-0 z-0"
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 to-background z-10" />
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center" />
+        </motion.div>
+
+        <div className="container mx-auto px-4 md:px-6 relative z-20">
           <motion.div 
             className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8"
             initial="hidden"
@@ -49,16 +65,16 @@ export const LandingPage: React.FC = () => {
             variants={containerVariants}
           >
             <motion.div variants={itemVariants}>
-              <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
+              <Badge variant="secondary" className="px-4 py-2 text-sm font-medium bg-background/80 backdrop-blur-sm text-foreground border border-border shadow-sm">
                 🎸 Профессиональное обучение музыке
               </Badge>
             </motion.div>
             
-            <motion.h1 variants={itemVariants} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground">
+            <motion.h1 variants={itemVariants} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground drop-shadow-sm">
               Раскройте свой <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">музыкальный потенциал</span>
             </motion.h1>
             
-            <motion.p variants={itemVariants} className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            <motion.p variants={itemVariants} className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed bg-background/50 backdrop-blur-sm p-4 rounded-xl">
               От первых аккордов до виртуозных соло. Индивидуальная программа обучения, адаптированная под ваши цели и музыкальные вкусы.
             </motion.p>
             
@@ -67,7 +83,7 @@ export const LandingPage: React.FC = () => {
                 Записаться на пробное
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 h-14 rounded-full border-2 hover:bg-secondary/50 transition-all duration-300">
+              <Button variant="outline" size="lg" className="text-lg px-8 h-14 rounded-full border-2 bg-background/80 backdrop-blur-sm hover:bg-secondary/80 transition-all duration-300">
                 <Play className="mr-2 h-5 w-5 fill-current" />
                 Смотреть видео-обзор
               </Button>
@@ -76,8 +92,94 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Site Features Section */}
+      <section className="py-24 bg-secondary/30 relative overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Инструменты для обучения</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Всё необходимое для вашего прогресса в одном месте
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Guitar,
+                title: "Онлайн Тюнер",
+                description: "Точная настройка гитары через микрофон вашего устройства. Поддержка различных строев.",
+                color: "text-orange-500",
+                bg: "bg-orange-50"
+              },
+              {
+                icon: Activity,
+                title: "Метроном",
+                description: "Развивайте чувство ритма. Настраиваемый темп, размеры и звуковые акценты.",
+                color: "text-blue-500",
+                bg: "bg-blue-50"
+              },
+              {
+                icon: Mic,
+                title: "Музыкальный диктант",
+                description: "Тренируйте слух, определяя ноты и интервалы. Интерактивные упражнения разной сложности.",
+                color: "text-purple-500",
+                bg: "bg-purple-50"
+              },
+              {
+                icon: Music,
+                title: "Тренажер аккордов",
+                description: "Библиотека аккордов с аппликатурами. Учитесь строить и распознавать аккорды.",
+                color: "text-green-500",
+                bg: "bg-green-50"
+              },
+              {
+                icon: FileText,
+                title: "Табы и ноты",
+                description: "Коллекция разборов популярных песен. Удобный просмотр и воспроизведение.",
+                color: "text-red-500",
+                bg: "bg-red-50"
+              },
+              {
+                icon: BookOpen,
+                title: "Блог о музыке",
+                description: "Статьи, советы и уроки по теории музыки, технике игры и оборудованию.",
+                color: "text-teal-500",
+                bg: "bg-teal-50"
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="h-full hover:shadow-lg transition-all duration-300 border-none bg-background group cursor-pointer">
+                  <CardHeader>
+                    <div className={`w-12 h-12 rounded-xl ${feature.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                    </div>
+                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="py-20 bg-secondary/30">
+      <section className="py-24">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -117,9 +219,9 @@ export const LandingPage: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
               >
-                <Card className="h-full border-none shadow-md hover:shadow-xl transition-all duration-300 bg-background group">
+                <Card className="h-full border shadow-sm hover:shadow-md transition-all duration-300 bg-background group">
                   <CardHeader>
-                    <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                       <feature.icon className="h-7 w-7 text-primary" />
                     </div>
                     <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
@@ -137,7 +239,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Services Section */}
-      <section className="py-24">
+      <section className="py-24 bg-secondary/30">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -156,7 +258,7 @@ export const LandingPage: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-colors">
+              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-colors bg-background">
                 <div className="h-2 bg-gradient-to-r from-blue-400 to-blue-600" />
                 <CardHeader>
                   <div className="flex items-center gap-4 mb-2">
@@ -196,7 +298,7 @@ export const LandingPage: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-colors">
+              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-colors bg-background">
                 <div className="h-2 bg-gradient-to-r from-indigo-400 to-purple-600" />
                 <CardHeader>
                   <div className="flex items-center gap-4 mb-2">
@@ -234,7 +336,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 bg-secondary/30">
+      <section className="py-24">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -254,7 +356,7 @@ export const LandingPage: React.FC = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
             >
-              <Card className="h-full hover:shadow-lg transition-shadow">
+              <Card className="h-full hover:shadow-lg transition-shadow bg-background">
                 <CardHeader>
                   <CardTitle>Пробное занятие</CardTitle>
                   <CardDescription>Познакомимся и определим цели</CardDescription>
@@ -321,7 +423,7 @@ export const LandingPage: React.FC = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="h-full hover:shadow-lg transition-shadow">
+              <Card className="h-full hover:shadow-lg transition-shadow bg-background">
                 <CardHeader>
                   <CardTitle>Абонемент</CardTitle>
                   <CardDescription>Для серьезного настроя</CardDescription>
@@ -349,7 +451,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* About Section */}
-      <section className="py-24 overflow-hidden">
+      <section className="py-24 overflow-hidden bg-secondary/30">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div 
@@ -406,7 +508,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 bg-secondary/30">
+      <section className="py-24">
         <div className="container mx-auto px-4 md:px-6">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
@@ -445,7 +547,7 @@ export const LandingPage: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="h-full bg-background border-none shadow-sm">
+                <Card className="h-full bg-background border shadow-sm">
                   <CardContent className="pt-6">
                     <div className="flex mb-4">
                       {[...Array(5)].map((_, i) => (
