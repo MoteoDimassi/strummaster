@@ -79,14 +79,12 @@ export const LandingPage: React.FC = () => {
             </motion.p>
             
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Button size="lg" className="text-lg px-8 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90">
-                Записаться на пробное
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 h-14 rounded-full border-2 bg-background/80 backdrop-blur-sm hover:bg-secondary/80 transition-all duration-300">
-                <Play className="mr-2 h-5 w-5 fill-current" />
-                Смотреть видео-обзор
-              </Button>
+              <a href="https://t.me/m/sL8-khnEN2Qy" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                <Button size="lg" className="text-lg px-8 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90 w-full">
+                  Записаться на пробное
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </a>
             </motion.div>
           </motion.div>
         </div>
@@ -238,10 +236,10 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Learning Directions Section */}
       <section className="py-24 bg-secondary/30">
         <div className="container mx-auto px-4 md:px-6">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -251,84 +249,142 @@ export const LandingPage: React.FC = () => {
             <p className="text-lg text-muted-foreground">Выберите свой путь в мире музыки</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-colors bg-background">
-                <div className="h-2 bg-gradient-to-r from-blue-400 to-blue-600" />
+              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-all duration-300 bg-background hover:shadow-lg">
+                <div className="h-2 bg-gradient-to-r from-green-400 to-emerald-600" />
                 <CardHeader>
                   <div className="flex items-center gap-4 mb-2">
-                    <div className="p-3 bg-blue-50 rounded-xl">
-                      <Guitar className="h-8 w-8 text-primary" />
+                    <div className="p-3 bg-green-50 rounded-xl">
+                      <Guitar className="h-8 w-8 text-green-600" />
                     </div>
-                    <CardTitle className="text-2xl">Академическая гитара</CardTitle>
+                    <CardTitle className="text-2xl">Ваши любимые песни</CardTitle>
                   </div>
                   <CardDescription className="text-base">
-                    Фундаментальное музыкальное образование
+                    Игра аккордами и ритмические фигуры
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-4">
+                  <ul className="space-y-3">
                     {[
-                      "Основы музыкальной грамоты и сольфеджио",
-                      "Правильная постановка рук и посадка",
-                      "Чтение нот с листа",
-                      "Классический репертуар (Бах, Джулиани, Сор)",
-                      "Подготовка к поступлению в муз. училище"
+                      "Игра аккордами",
+                      "Все варианты боя и перебора",
+                      "Грамотная работа рук",
+                      "Самые эффективные техники",
+                      "Подбор на слух",
+                      "Анализ гармонии в песнях",
+                      "Транспонирование в удобную тональность",
+                      "Создание собственных аранжировок"
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <div className="mt-1 bg-green-100 rounded-full p-1">
                           <Check className="h-3 w-3 text-green-600" />
                         </div>
-                        <span className="text-muted-foreground">{item}</span>
+                        <span className="text-muted-foreground text-sm">{item}</span>
                       </li>
                     ))}
                   </ul>
                 </CardContent>
+                <CardFooter>
+                  <Button className="w-full mt-2" variant="outline">Подробнее</Button>
+                </CardFooter>
               </Card>
             </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-colors bg-background">
-                <div className="h-2 bg-gradient-to-r from-indigo-400 to-purple-600" />
+              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-all duration-300 bg-background hover:shadow-lg">
+                <div className="h-2 bg-gradient-to-r from-blue-400 to-indigo-600" />
                 <CardHeader>
                   <div className="flex items-center gap-4 mb-2">
-                    <div className="p-3 bg-indigo-50 rounded-xl">
-                      <Music className="h-8 w-8 text-indigo-600" />
+                    <div className="p-3 bg-blue-50 rounded-xl">
+                      <Music className="h-8 w-8 text-blue-600" />
                     </div>
-                    <CardTitle className="text-2xl">Современная гитара</CardTitle>
+                    <CardTitle className="text-2xl">Фингерстайл</CardTitle>
                   </div>
                   <CardDescription className="text-base">
-                    Рок, блюз, джаз и популярная музыка
+                    Искусство игры пальцами
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-4">
+                  <ul className="space-y-3">
                     {[
-                      "Игра на электрогитаре и акустике",
-                      "Разбор любимых песен и риффов",
-                      "Импровизация и основы композиции",
-                      "Работа со звуком и эффектами",
-                      "Основы звукозаписи в домашних условиях"
+                      "Чтение табулатур",
+                      "Работа с ритмом",
+                      "Правильная постановка рук",
+                      "Изучение перкуссии на гитаре",
+                      "Техники легато и глиссандо",
+                      "Фламенко элементы",
+                      "Комбинирование мелодии и аккомпанемента",
+                      "Собственные композиции в стиле фингерстайл"
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3">
-                        <div className="mt-1 bg-green-100 rounded-full p-1">
-                          <Check className="h-3 w-3 text-green-600" />
+                        <div className="mt-1 bg-blue-100 rounded-full p-1">
+                          <Check className="h-3 w-3 text-blue-600" />
                         </div>
-                        <span className="text-muted-foreground">{item}</span>
+                        <span className="text-muted-foreground text-sm">{item}</span>
                       </li>
                     ))}
                   </ul>
                 </CardContent>
+                <CardFooter>
+                  <Button className="w-full mt-2" variant="outline">Подробнее</Button>
+                </CardFooter>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="h-full overflow-hidden border-2 hover:border-primary/20 transition-all duration-300 bg-background hover:shadow-lg">
+                <div className="h-2 bg-gradient-to-r from-purple-400 to-pink-600" />
+                <CardHeader>
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="p-3 bg-purple-50 rounded-xl">
+                      <BookOpen className="h-8 w-8 text-purple-600" />
+                    </div>
+                    <CardTitle className="text-2xl">Аранжировка</CardTitle>
+                  </div>
+                  <CardDescription className="text-base">
+                    Теория и практика создания музыки
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {[
+                      "Работа со слухом",
+                      "Изучение сольфеджио",
+                      "Изучение грифа",
+                      "Развитие аппликатурного мышления",
+                      "Гармония и аккордовая теория",
+                      "Анализ музыкальных форм",
+                      "Оркестровка для гитары",
+                      "Аранжировка песен для вокала и гитары"
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <div className="mt-1 bg-purple-100 rounded-full p-1">
+                          <Check className="h-3 w-3 text-purple-600" />
+                        </div>
+                        <span className="text-muted-foreground text-sm">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full mt-2" variant="outline">Подробнее</Button>
+                </CardFooter>
               </Card>
             </motion.div>
           </div>
@@ -375,7 +431,9 @@ export const LandingPage: React.FC = () => {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" variant="outline">Записаться</Button>
+                  <a href="https://t.me/m/sL8-khnEN2Qy" target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button className="w-full" variant="outline">Записаться</Button>
+                  </a>
                 </CardFooter>
               </Card>
             </motion.div>
@@ -411,7 +469,9 @@ export const LandingPage: React.FC = () => {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" size="lg">Записаться</Button>
+                  <a href="https://t.me/m/sL8-khnEN2Qy" target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button className="w-full" size="lg">Записаться</Button>
+                  </a>
                 </CardFooter>
               </Card>
             </motion.div>
@@ -442,7 +502,9 @@ export const LandingPage: React.FC = () => {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" variant="outline">Купить абонемент</Button>
+                  <a href="https://t.me/m/sL8-khnEN2Qy" target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button className="w-full" variant="outline">Купить абонемент</Button>
+                  </a>
                 </CardFooter>
               </Card>
             </motion.div>
@@ -496,12 +558,6 @@ export const LandingPage: React.FC = () => {
               <p className="text-lg text-muted-foreground leading-relaxed">
                 За 10 лет игры я прошел путь от дворовых песен до сложных джазовых импровизаций и классических произведений. Я знаю, с какими трудностями сталкиваются новички, и знаю, как их преодолеть максимально эффективно.
               </p>
-              <div className="pt-4">
-                <Button variant="secondary" className="gap-2">
-                  <MessageCircle className="w-4 h-4" />
-                  Задать вопрос лично
-                </Button>
-              </div>
             </motion.div>
           </div>
         </div>
@@ -590,14 +646,12 @@ export const LandingPage: React.FC = () => {
                 Запишитесь на бесплатное пробное занятие прямо сейчас и сделайте первый шаг к своей мечте.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button size="lg" variant="secondary" className="text-lg h-14 px-8 rounded-full shadow-lg">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Записаться на урок
-                </Button>
-                <Button size="lg" variant="outline" className="text-lg h-14 px-8 rounded-full bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                  <MessageCircle className="mr-2 h-5 w-5" />
-                  Задать вопрос
-                </Button>
+                <a href="https://t.me/m/sL8-khnEN2Qy" target="_blank" rel="noopener noreferrer">
+                  <Button size="lg" variant="secondary" className="text-lg h-14 px-8 rounded-full shadow-lg">
+                    <Calendar className="mr-2 h-5 w-5" />
+                    Записаться на урок
+                  </Button>
+                </a>
               </div>
             </div>
           </motion.div>
