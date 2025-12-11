@@ -130,7 +130,7 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
                     onClick={onClose}
                     className="px-6 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-100 transition-colors"
                 >
-                    Cancel
+                    Отмена
                 </button>
             )}
             <button
@@ -138,7 +138,7 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
                 disabled={selectedChordIndices.length === 0}
                 className="px-8 py-3 bg-brand-blue hover:bg-brand-hover text-white rounded-xl font-bold shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
-                {isModal ? 'Apply & Restart' : 'Start Training'}
+                {isModal ? 'Применить и перезапустить' : 'Начать тренировку'}
             </button>
         </div>
       </div>
