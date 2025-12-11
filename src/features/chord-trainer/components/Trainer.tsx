@@ -74,6 +74,20 @@ const Trainer: React.FC = () => {
     }
   };
 
+  const playUserChord = () => {
+    if (activeNotes.length > 0) {
+        audioService.resume();
+        audioService.playChord(activeNotes);
+    }
+  };
+
+  const playUserArpeggio = () => {
+    if (activeNotes.length > 0) {
+        audioService.resume();
+        audioService.playArpeggio(activeNotes);
+    }
+  };
+
   const handleNext = () => {
     dispatch(generateTask());
   };
@@ -195,11 +209,29 @@ const Trainer: React.FC = () => {
           <Staff />
 
           {/* Piano */}
-          <div className="pt-4">
-              <Piano 
-                  startOctave={3} 
-                  numOctaves={3} 
-                  activeNotes={activeNotes} 
+          <div className="pt-4 space-y-2">
+              <div className="flex justify-center space-x-2">
+                  <button
+                      onClick={playUserChord}
+                      disabled={activeNotes.length === 0}
+                      className="px-3 py-1.5 text-xs font-medium bg-brand-blue hover:bg-brand-hover text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shadow-sm"
+                  >
+                      <Volume2 size={14} />
+                      Play My Chord
+                  </button>
+                  <button
+                      onClick={playUserArpeggio}
+                      disabled={activeNotes.length === 0}
+                      className="px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shadow-sm"
+                  >
+                      <AudioLines size={14} />
+                      Play My Arpeggio
+                  </button>
+              </div>
+              <Piano
+                  startOctave={3}
+                  numOctaves={3}
+                  activeNotes={activeNotes}
                   onNoteClick={handlePianoNoteClick}
               />
           </div>
