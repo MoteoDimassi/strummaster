@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CHORD_TYPES } from '../../features/chord-trainer/utils/musicTheory';
+import { CHORD_TYPES, MIN_MIDI_NOTE, MAX_MIDI_NOTE } from '../../features/chord-trainer/utils/musicTheory';
 import { generateChordMidi } from '../../features/chord-trainer/utils/chordLogic';
 
 interface ChordTrainerState {
@@ -73,27 +73,56 @@ const chordTrainerSlice = createSlice({
       // Logic to pick a random chord from selected types
       // Root note is fixed by settings, but octave can vary around middle C (60)
       
-      // Select random octave from enabled octaves
-      const randomOctave = state.selectedOctaves[Math.floor(Math.random() * state.selectedOctaves.length)];
-      const octaveOffset = (randomOctave + 1) * 12; // MIDI octave calculation (C3 is 48, so octave 3 -> 48)
-      
-      let currentRootIndex = state.rootNoteIndex;
-      if (state.isRandomRoot) {
-        currentRootIndex = Math.floor(Math.random() * 12);
+      let validTaskFound = false;
+      let attempts = 0;
+      const MAX_ATTEMPTS = 50;
+
+      while (!validTaskFound && attempts < MAX_ATTEMPTS) {
+        attempts++;
+
+        // Select random octave from enabled octaves
+        const randomOctave = state.selectedOctaves[Math.floor(Math.random() * state.selectedOctaves.length)];
+        const octaveOffset = (randomOctave + 1) * 12; // MIDI octave calculation (C3 is 48, so octave 3 -> 48)
+        
+        let currentRootIndex = state.rootNoteIndex;
+        if (state.isRandomRoot) {
+          currentRootIndex = Math.floor(Math.random() * 12);
+        }
+
+        const rootMidi = octaveOffset + currentRootIndex;
+        
+        const randomTypeIndex = state.selectedChordIndices[Math.floor(Math.random() * state.selectedChordIndices.length)];
+        const chordType = CHORD_TYPES[randomTypeIndex];
+        
+        const notes = generateChordMidi(rootMidi, chordType);
+        
+        // Check if all notes are within the piano range
+        const isWithinRange = notes.every(note => note >= MIN_MIDI_NOTE && note <= MAX_MIDI_NOTE);
+
+        if (isWithinRange) {
+            state.currentTask = {
+                rootMidi,
+                chordTypeIndex: randomTypeIndex,
+                notes,
+            };
+            validTaskFound = true;
+        }
       }
 
-      const rootMidi = octaveOffset + currentRootIndex;
-      
-      const randomTypeIndex = state.selectedChordIndices[Math.floor(Math.random() * state.selectedChordIndices.length)];
-      const chordType = CHORD_TYPES[randomTypeIndex];
-      
-      const notes = generateChordMidi(rootMidi, chordType);
-      
-      state.currentTask = {
-        rootMidi,
-        chordTypeIndex: randomTypeIndex,
-        notes,
-      };
+      if (!validTaskFound) {
+          // Fallback if no valid chord found (should be rare with correct settings)
+          // Just generate a simple C major in the lowest selected octave or default
+          const fallbackOctave = state.selectedOctaves[0] || 3;
+          const rootMidi = (fallbackOctave + 1) * 12; // C
+          const chordType = CHORD_TYPES[0]; // Major
+          const notes = generateChordMidi(rootMidi, chordType);
+           state.currentTask = {
+                rootMidi,
+                chordTypeIndex: 0,
+                notes,
+            };
+      }
+
       // Clear user input on new task
       state.activeNotes = [];
       state.detectedChordName = '';

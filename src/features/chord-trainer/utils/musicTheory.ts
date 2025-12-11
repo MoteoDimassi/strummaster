@@ -45,3 +45,9 @@ export const midiToNoteName = (midi: number): string => {
 export const midiToFreq = (midi: number): number => {
   return 440 * Math.pow(2, (midi - 69) / 12);
 };
+
+// Piano Configuration
+export const PIANO_START_OCTAVE = 3;
+export const PIANO_OCTAVES_COUNT = 3;
+export const MIN_MIDI_NOTE = PIANO_START_OCTAVE * 12 + 12; // C3 = 48
+export const MAX_MIDI_NOTE = MIN_MIDI_NOTE + (PIANO_OCTAVES_COUNT * 12) - 1; // B5 = 83

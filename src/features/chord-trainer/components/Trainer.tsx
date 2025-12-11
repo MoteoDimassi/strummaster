@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { generateTask, setDetectedChordName, clearNotes, toggleNote, markTaskSolved } from '../../../store/slices/chordTrainerSlice';
 import { identifyChordFromMidi } from '../utils/chordLogic';
+import { PIANO_START_OCTAVE, PIANO_OCTAVES_COUNT } from '../utils/musicTheory';
 import { audioService } from '../services/audioService';
 import Piano from './Piano';
 import Staff from './Staff';
@@ -229,8 +230,8 @@ const Trainer: React.FC = () => {
                   </button>
               </div>
               <Piano
-                  startOctave={3}
-                  numOctaves={3}
+                  startOctave={PIANO_START_OCTAVE}
+                  numOctaves={PIANO_OCTAVES_COUNT}
                   activeNotes={activeNotes}
                   onNoteClick={handlePianoNoteClick}
               />
