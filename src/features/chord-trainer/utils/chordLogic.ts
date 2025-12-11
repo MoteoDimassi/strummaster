@@ -58,8 +58,8 @@ export const identifyChordFromMidi = (midiNotes: number[]): IdentifiedChord | nu
 
   return {
     root: '?',
-    quality: 'Unknown',
-    name: 'Unknown Chord',
+    quality: 'Неизвестный',
+    name: 'Неизвестный аккорд',
     exactMatch: false
   };
 };

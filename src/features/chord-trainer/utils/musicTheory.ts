@@ -7,31 +7,31 @@ export interface ChordDefinition {
 }
 
 export const CHORD_TYPES: ChordDefinition[] = [
-  // Triads
-  { name: 'Major', intervals: [0, 4, 7], suffix: '' },
-  { name: 'Minor', intervals: [0, 3, 7], suffix: 'm' },
-  { name: 'Diminished', intervals: [0, 3, 6], suffix: 'dim' },
-  { name: 'Augmented', intervals: [0, 4, 8], suffix: 'aug' },
+  // Трезвучия
+  { name: 'Мажор', intervals: [0, 4, 7], suffix: '' },
+  { name: 'Минор', intervals: [0, 3, 7], suffix: 'm' },
+  { name: 'Уменьшенный', intervals: [0, 3, 6], suffix: 'dim' },
+  { name: 'Увеличенный', intervals: [0, 4, 8], suffix: 'aug' },
   { name: 'Sus2', intervals: [0, 2, 7], suffix: 'sus2' },
   { name: 'Sus4', intervals: [0, 5, 7], suffix: 'sus4' },
   
-  // 7th Chords
-  { name: 'Major 7', intervals: [0, 4, 7, 11], suffix: 'maj7' },
-  { name: 'Minor 7', intervals: [0, 3, 7, 10], suffix: 'm7' },
-  { name: 'Dominant 7', intervals: [0, 4, 7, 10], suffix: '7' },
+  // Септаккорды
+  { name: 'Мажорный септ', intervals: [0, 4, 7, 11], suffix: 'maj7' },
+  { name: 'Минорный септ', intervals: [0, 3, 7, 10], suffix: 'm7' },
+  { name: 'Доминантсепт', intervals: [0, 4, 7, 10], suffix: '7' },
   
-  // 6th Chords
-  { name: 'Major 6', intervals: [0, 4, 7, 9], suffix: '6' },
-  { name: 'Minor 6', intervals: [0, 3, 7, 9], suffix: 'm6' },
+  // Секстаккорды
+  { name: 'Мажорный секст', intervals: [0, 4, 7, 9], suffix: '6' },
+  { name: 'Минорный секст', intervals: [0, 3, 7, 9], suffix: 'm6' },
 
-  // 9th Chords (Extended intervals for voicing)
-  { name: 'Major 9', intervals: [0, 4, 7, 11, 14], suffix: 'maj9' },
-  { name: 'Minor 9', intervals: [0, 3, 7, 10, 14], suffix: 'm9' },
-  { name: 'Dominant 9', intervals: [0, 4, 7, 10, 14], suffix: '9' },
-  { name: 'Add 9', intervals: [0, 4, 7, 14], suffix: 'add9' },
+  // Нонаккорды (расширенные интервалы для голосоведения)
+  { name: 'Мажорный нон', intervals: [0, 4, 7, 11, 14], suffix: 'maj9' },
+  { name: 'Минорный нон', intervals: [0, 3, 7, 10, 14], suffix: 'm9' },
+  { name: 'Доминантнон', intervals: [0, 4, 7, 10, 14], suffix: '9' },
+  { name: 'Добавленный нон', intervals: [0, 4, 7, 14], suffix: 'add9' },
 
-  // 11th Chords
-  { name: 'Minor 11', intervals: [0, 3, 7, 10, 14, 17], suffix: 'm11' },
+  // Ундецимаккорды
+  { name: 'Минорный ундецим', intervals: [0, 3, 7, 10, 14, 17], suffix: 'm11' },
 ];
 
 // Helper to convert MIDI number to Note Name (e.g., 60 -> C4)

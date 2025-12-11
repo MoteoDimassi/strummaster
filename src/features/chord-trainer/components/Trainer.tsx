@@ -114,11 +114,11 @@ const Trainer: React.FC = () => {
         <div className="flex items-center space-x-4">
             <div className="flex items-center text-amber-600 font-bold space-x-2 bg-amber-50 px-4 py-2 rounded-full border border-amber-200 shadow-sm">
                 <Trophy size={18} className="fill-amber-500 stroke-amber-700" />
-                <span>Score: {score}</span>
+                <span>Счёт: {score}</span>
             </div>
             
             <div className="text-sm font-medium bg-blue-50 text-blue-700 px-3 py-2 rounded-lg border border-blue-100 hidden sm:block">
-            Root: {identifyChordFromMidi(currentTask.notes)?.root || '?'}
+            Тоника: {identifyChordFromMidi(currentTask.notes)?.root || '?'}
             </div>
         </div>
 
@@ -126,15 +126,15 @@ const Trainer: React.FC = () => {
             <button
                 onClick={() => setGameStarted(false)}
                 className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
-                title="Exit"
+                title="Выход"
             >
                 <RotateCcw size={20} />
-                <span className="hidden sm:inline text-sm font-medium">Exit</span>
+                <span className="hidden sm:inline text-sm font-medium">Выход</span>
             </button>
             <button
                 onClick={() => setIsSettingsOpen(true)}
                 className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Settings"
+                title="Настройки"
             >
                 <Settings size={24} />
             </button>
@@ -158,33 +158,33 @@ const Trainer: React.FC = () => {
                   className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-brand-blue text-white px-5 py-3 rounded-lg shadow-md hover:bg-brand-hover active:scale-95 transition-all"
               >
                   <Volume2 size={24} />
-                  <span className="font-semibold">Chord</span>
+                  <span className="font-semibold">Аккорд</span>
               </button>
-              <button 
+              <button
                   onClick={playArpeggio}
                   className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-indigo-600 text-white px-5 py-3 rounded-lg shadow-md hover:bg-indigo-700 active:scale-95 transition-all"
               >
                   <AudioLines size={24} />
-                  <span className="font-semibold">Arpeggio</span>
+                  <span className="font-semibold">Арпеджио</span>
               </button>
           </div>
 
           <div className="flex items-center space-x-4 w-full md:w-auto justify-end">
-               <button 
+               <button
                   onClick={() => dispatch(clearNotes())}
                   className="p-3 text-gray-500 hover:bg-gray-100 rounded-lg border border-gray-200 transition"
-                  title="Clear Keys"
+                  title="Очистить клавиши"
               >
                   <RefreshCw size={20} />
               </button>
-              <button 
+              <button
                   onClick={handleNext}
                   className={`flex items-center space-x-2 px-6 py-3 rounded-lg shadow-md active:scale-95 transition-all text-white
-                      ${isCorrect 
-                          ? 'bg-green-600 hover:bg-green-700 animate-pulse' 
+                      ${isCorrect
+                          ? 'bg-green-600 hover:bg-green-700 animate-pulse'
                           : 'bg-slate-800 hover:bg-slate-900'}`}
               >
-                  <span>Next Chord</span>
+                  <span>Следующий аккорд</span>
                   <ArrowRight size={20} />
               </button>
           </div>
@@ -197,11 +197,11 @@ const Trainer: React.FC = () => {
               {isCorrect ? (
                   <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-6 py-2 rounded-full font-bold shadow-sm">
                       <CheckCircle2 size={24} />
-                      <span>Correct! It's a {detectedChordName}</span>
+                      <span>Правильно! Это {detectedChordName}</span>
                   </div>
               ) : (
                    <div className="flex items-center justify-center text-gray-500 font-medium text-lg">
-                      {detectedChordName ? `Detected: ${detectedChordName}` : 'Select notes on piano...'}
+                      {detectedChordName ? `Определено: ${detectedChordName}` : 'Выберите ноты на пианино...'}
                   </div>
               )}
           </div>
@@ -218,7 +218,7 @@ const Trainer: React.FC = () => {
                       className="px-3 py-1.5 text-xs font-medium bg-brand-blue hover:bg-brand-hover text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shadow-sm"
                   >
                       <Volume2 size={14} />
-                      Play My Chord
+                      Играть мой аккорд
                   </button>
                   <button
                       onClick={playUserArpeggio}
@@ -226,7 +226,7 @@ const Trainer: React.FC = () => {
                       className="px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shadow-sm"
                   >
                       <AudioLines size={14} />
-                      Play My Arpeggio
+                      Играть моё арпеджио
                   </button>
               </div>
               <Piano

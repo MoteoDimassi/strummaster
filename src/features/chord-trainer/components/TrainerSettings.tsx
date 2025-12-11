@@ -26,7 +26,7 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
         <div className="flex items-center justify-between border-b border-gray-100 pb-4">
             <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                 <Settings className="mr-3 text-brand-blue" size={28} />
-                {isModal ? 'Trainer Settings' : 'Chord Trainer Setup'}
+                {isModal ? 'Настройки тренажёра' : 'Настройка тренажёра аккордов'}
             </h2>
             {isModal && onClose && (
                 <button 
@@ -42,7 +42,7 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-800">
-                    Select Root Note
+                    Выберите тонику
                 </h3>
                 <button
                     onClick={() => dispatch(setRandomRoot(!isRandomRoot))}
@@ -52,14 +52,14 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 >
                     <Shuffle size={16} />
-                    <span>Random Root</span>
+                    <span>Случайная тоника</span>
                 </button>
             </div>
             
             <p className="text-sm text-gray-500">
                 {isRandomRoot
-                    ? "Chords will be generated from random root notes."
-                    : "The chord questions will be based on this root note (transposed randomly within octaves)."}
+                    ? "Аккорды будут генерироваться от случайных тоник."
+                    : "Вопросы по аккордам будут основаны на этой тонике (транспонируются случайным образом в пределах октав)."}
             </p>
 
             <div className={`grid grid-cols-6 sm:grid-cols-12 gap-2 transition-opacity duration-200 ${isRandomRoot ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
@@ -80,11 +80,11 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
 
         {/* Octave Selection */}
         <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">Select Octaves</h3>
-            <p className="text-sm text-gray-500">Chords will be generated within these octaves.</p>
+            <h3 className="text-lg font-semibold text-gray-800">Выберите октавы</h3>
+            <p className="text-sm text-gray-500">Аккорды будут генерироваться в этих октавах.</p>
             <div className="flex flex-wrap gap-3">
                 {[3, 4, 5].map((octave) => {
-                    const octaveName = octave === 3 ? 'Small Octave' : octave === 4 ? '1st Octave' : '2nd Octave';
+                    const octaveName = octave === 3 ? 'Малая октава' : octave === 4 ? 'Первая октава' : 'Вторая октава';
                     return (
                         <button
                             key={octave}
@@ -103,7 +103,7 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
 
         {/* Chord Types Selection */}
         <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">Select Chord Types</h3>
+            <h3 className="text-lg font-semibold text-gray-800">Выберите типы аккордов</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {CHORD_TYPES.map((chord, index) => (
                     <button
