@@ -237,9 +237,9 @@ footer .bg-slate-800:hover {
   }
 }
 
-/* Улучшенные стили для индикатора "Synth Active" */
-header .border,
-footer .border {
+/* Улучшенные стили для индикатора "Synth Active" - применяем только к специфическим элементам */
+header .border.border-indicator,
+footer .border.border-indicator {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 

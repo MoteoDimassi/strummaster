@@ -103,7 +103,7 @@ export const Footer: React.FC = () => {
             <div className="text-xs text-muted-foreground font-mono">
               Версия: {appVersion}
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground border border-border px-3 py-1 rounded-full">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground border border-border border-indicator px-3 py-1 rounded-full">
               <Music size={10} />
               <span>Synth Active</span>
             </div>
