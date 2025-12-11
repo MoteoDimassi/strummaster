@@ -69,6 +69,10 @@ export class TunerService {
   startTunerServiceAnalysis(callback: (result: TunerResult | null) => void): void {
     tunerAdapter.startTunerServiceAnalysis(callback);
   }
+
+  setMode(mode: 'chromatic' | 'guitar'): void {
+    tunerAdapter.setMode(mode);
+  }
 }
 
 export const tunerService = new TunerService();

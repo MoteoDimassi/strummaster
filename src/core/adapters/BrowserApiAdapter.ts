@@ -11,7 +11,7 @@ export interface TimerApiAdapter {
 
 // Интерфейс для работы с анимацией
 export interface AnimationApiAdapter {
-  requestAnimationFrame(callback: () => void): number;
+  requestAnimationFrame(callback: (timestamp: number) => void): number;
   cancelAnimationFrame(id: number): void;
 }
 
@@ -38,7 +38,7 @@ export class WebTimerApiAdapter implements TimerApiAdapter {
 
 // Реализация адаптера для анимации на основе браузерного API
 export class WebAnimationApiAdapter implements AnimationApiAdapter {
-  requestAnimationFrame(callback: () => void): number {
+  requestAnimationFrame(callback: (timestamp: number) => void): number {
     return window.requestAnimationFrame(callback);
   }
 

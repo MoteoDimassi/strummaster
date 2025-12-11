@@ -62,17 +62,18 @@ export const TunerModal: React.FC = () => {
 
   const handleModeChange = (newMode: TunerMode) => {
     dispatch(setTunerMode(newMode));
+    tunerService.setMode(newMode);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-800/95 border border-white/10 rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md p-6 relative flex flex-col gap-6">
         {/* Кнопка закрытия */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Закрыть"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -82,17 +83,17 @@ export const TunerModal: React.FC = () => {
         </button>
 
         {/* Заголовок */}
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">Тюнер</h2>
+        <h2 className="text-2xl font-bold text-foreground text-center">Тюнер</h2>
 
         {/* Ошибка */}
         {error && (
-          <div className="bg-red-900/20 border border-red-500/30 text-red-400 p-3 rounded-lg mb-4 text-sm">
+          <div className="bg-destructive/10 border border-destructive/30 text-destructive p-3 rounded-lg text-sm">
             {error}
           </div>
         )}
 
         {/* Управление */}
-        <TunerControls 
+        <TunerControls
           isRunning={isRunning}
           mode={mode}
           onToggle={isRunning ? stopTunerService : startTunerService}
@@ -100,7 +101,9 @@ export const TunerModal: React.FC = () => {
         />
 
         {/* Дисплей тюнера */}
-        <TunerDisplay />
+        <div className="mt-4">
+          <TunerDisplay />
+        </div>
       </div>
     </div>
   );

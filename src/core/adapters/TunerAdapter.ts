@@ -102,7 +102,7 @@ class WebAudioDataAdapter implements AudioDataAdapter {
 class WebAnimationAdapter implements AnimationAdapter {
   constructor(private animationApiAdapter: AnimationApiAdapter) {}
 
-  requestAnimationFrame(callback: () => void): number {
+  requestAnimationFrame(callback: (timestamp: number) => void): number {
     return this.animationApiAdapter.requestAnimationFrame(callback);
   }
 
@@ -122,6 +122,7 @@ export class TunerAdapter {
   private buffer: Float32Array;
   private stopContinuousAnalysis: (() => void) | null = null;
   private isRunning: boolean = false;
+  private currentMode: 'chromatic' | 'guitar' = 'chromatic';
 
   constructor(
     animationApiAdapter?: AnimationApiAdapter,
@@ -213,7 +214,19 @@ export class TunerAdapter {
         // console.log('[TunerAdapter] Результат анализа:', result); // Слишком много логов
         callback(result);
       },
-      () => this.isRunning
+      () => this.isRunning,
+      () => {
+        // Получаем текущий режим из store через глобальный объект window или другой механизм
+        // В данном случае, так как TunerAdapter не имеет доступа к Redux store,
+        // мы можем использовать временное решение или передавать режим через метод
+        // Но лучше всего использовать TunerService как фасад
+        
+        // Попытка получить режим из TunerService, если бы он был доступен
+        // Но так как TunerService импортирует TunerAdapter, мы не можем импортировать TunerService здесь (циклическая зависимость)
+        
+        // В качестве временного решения, мы будем использовать свойство currentMode, которое нужно добавить в TunerAdapter
+        return this.currentMode;
+      }
     );
     console.log('[TunerAdapter] Анализ запущен');
   }
@@ -242,6 +255,10 @@ export class TunerAdapter {
     } else {
       console.log('Using TunerService for analysis');
     }
+  }
+
+  setMode(mode: 'chromatic' | 'guitar'): void {
+    this.currentMode = mode;
   }
 }
 

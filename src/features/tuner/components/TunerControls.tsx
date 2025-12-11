@@ -1,5 +1,7 @@
 import React from 'react';
 import { TunerMode } from '../../../store/slices/tunerSlice';
+import { Button } from '@/src/components/ui/button';
+import { Mic, MicOff } from 'lucide-react';
 
 interface TunerControlsProps {
   isRunning: boolean;
@@ -15,42 +17,48 @@ export const TunerControls: React.FC<TunerControlsProps> = ({
   onModeChange
 }) => {
   return (
-    <div className="mb-6">
-      <button
+    <div className="flex flex-col gap-6 w-full max-w-md">
+      <Button
         onClick={onToggle}
-        className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-          isRunning 
-            ? 'bg-red-600 hover:bg-red-700 text-white' 
-            : 'bg-blue-600 hover:bg-blue-700 text-white'
-        }`}
+        variant={isRunning ? "destructive" : "default"}
+        size="lg"
+        className="w-full text-lg h-12"
       >
-        {isRunning ? 'Выключить микрофон' : 'Включить микрофон'}
-      </button>
+        {isRunning ? (
+          <>
+            <MicOff className="mr-2 h-5 w-5" />
+            Выключить микрофон
+          </>
+        ) : (
+          <>
+            <Mic className="mr-2 h-5 w-5" />
+            Включить микрофон
+          </>
+        )}
+      </Button>
 
       {/* Переключатель режима */}
-      <div className="flex justify-center gap-6 mt-4">
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="radio"
-            name="mode"
-            value="chromatic"
-            checked={mode === 'chromatic'}
-            onChange={(e) => onModeChange(e.target.value as TunerMode)}
-            className="mr-2 text-blue-600 focus:ring-blue-500"
-          />
-          <span className="text-slate-300">Хроматический</span>
-        </label>
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="radio"
-            name="mode"
-            value="guitar"
-            checked={mode === 'guitar'}
-            onChange={(e) => onModeChange(e.target.value as TunerMode)}
-            className="mr-2 text-blue-600 focus:ring-blue-500"
-          />
-          <span className="text-slate-300">Гитара (EADGBE)</span>
-        </label>
+      <div className="flex justify-center gap-2 p-1 bg-muted rounded-lg">
+        <button
+          onClick={() => onModeChange('chromatic')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+            mode === 'chromatic'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Хроматический
+        </button>
+        <button
+          onClick={() => onModeChange('guitar')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+            mode === 'guitar'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Гитара
+        </button>
       </div>
     </div>
   );

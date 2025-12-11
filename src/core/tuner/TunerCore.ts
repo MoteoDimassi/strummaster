@@ -7,7 +7,7 @@ export interface AudioDataAdapter {
 }
 
 export interface AnimationAdapter {
-  requestAnimationFrame(callback: () => void): number;
+  requestAnimationFrame(callback: (timestamp: number) => void): number;
   cancelAnimationFrame(id: number): void;
 }
 
@@ -122,7 +122,8 @@ export class TunerCore {
     }
     rms = Math.sqrt(rms / SIZE);
 
-    if (rms < 0.01) // not enough signal
+    // Увеличиваем порог чувствительности, чтобы отсечь фоновый шум
+    if (rms < 0.02) // not enough signal
       return -1;
 
     let r1 = 0, r2 = SIZE - 1, thres = 0.2;
@@ -161,13 +162,17 @@ export class TunerCore {
    * Анализирует аудио данные с использованием адаптера
    * @param audioAdapter - адаптер для получения аудио данных
    * @param buffer - буфер для хранения аудио данных
+   * @param mode - режим тюнера ('chromatic' | 'guitar')
    * @returns результат анализа или null, если частота не определена
    */
-  analyzeAudioData(audioAdapter: AudioDataAdapter, buffer: Float32Array): TunerResult | null {
+  analyzeAudioData(audioAdapter: AudioDataAdapter, buffer: Float32Array, mode: 'chromatic' | 'guitar' = 'chromatic'): TunerResult | null {
     audioAdapter.getFloatTimeDomainData(buffer);
     const frequency = this.autoCorrelate(buffer, audioAdapter.getSampleRate());
 
     if (frequency !== -1) {
+      if (mode === 'guitar') {
+        return this.analyzeFrequencyForGuitar(frequency);
+      }
       return this.analyzeFrequency(frequency);
     }
 
@@ -181,31 +186,39 @@ export class TunerCore {
    * @param buffer - буфер для хранения аудио данных
    * @param callback - функция обратного вызова для передачи результатов
    * @param isRunning - функция для проверки состояния работы
+   * @param getMode - функция для получения текущего режима тюнера
    */
   startContinuousAnalysis(
     audioAdapter: AudioDataAdapter,
     animationAdapter: AnimationAdapter,
     buffer: Float32Array,
     callback: (result: TunerResult | null) => void,
-    isRunning: () => boolean
+    isRunning: () => boolean,
+    getMode: () => 'chromatic' | 'guitar' = () => 'chromatic'
   ): () => void {
     let rafID: number | null = null;
+    let lastUpdate = 0;
+    const updateInterval = 50; // Ограничиваем обновление UI до 20 раз в секунду для плавности
 
-    const analyze = () => {
+    const analyze = (timestamp: number) => {
       if (!isRunning()) {
         callback(null);
         return;
       }
 
-      const result = this.analyzeAudioData(audioAdapter, buffer);
-      callback(result);
+      if (timestamp - lastUpdate > updateInterval) {
+        const result = this.analyzeAudioData(audioAdapter, buffer, getMode());
+        callback(result);
+        lastUpdate = timestamp;
+      }
 
       if (isRunning()) {
         rafID = animationAdapter.requestAnimationFrame(analyze);
       }
     };
 
-    analyze();
+    // Запускаем первый кадр
+    rafID = animationAdapter.requestAnimationFrame(analyze);
 
     // Возвращаем функцию для остановки анализа
     return () => {
