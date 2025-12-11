@@ -156,9 +156,9 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
   };
 
   return (
-    <div className="container mx-auto max-w-5xl p-2 md:p-4 text-slate-900">
+    <div className="container mx-auto max-w-5xl p-2 md:p-4 text-slate-900 flex flex-col items-center">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="w-full flex justify-between items-center mb-4">
         <button onClick={onBack} className="flex items-center text-slate-500 hover:text-slate-800 text-sm font-medium">
             <ArrowLeft size={18} className="mr-1"/> Выход
         </button>
@@ -176,12 +176,12 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left Col: Controls */}
-        <div className="lg:col-span-1 space-y-3">
-            <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+        <div className="lg:col-span-1 space-y-3 flex flex-col items-center">
+            <div className="w-full bg-white p-3 rounded-xl shadow-sm border border-slate-200">
                 <div className="flex gap-2">
-                    <button 
+                    <button
                         onClick={playMelody}
                         disabled={settings.replayLimit !== 'infinity' && playCount >= settings.replayLimit}
                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium text-sm transition-colors ${
@@ -193,7 +193,7 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                         <Play size={18} /> Мелодия
                     </button>
                     
-                    <button 
+                    <button
                         onClick={playScale}
                         className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-medium text-sm bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition-colors"
                     >
@@ -202,12 +202,12 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                 </div>
             </div>
 
-            <div className={`p-3 rounded-xl border text-center transition-colors ${
-                feedback === 'success' ? 'bg-green-50 border-green-200' : 
+            <div className={`w-full p-3 rounded-xl border text-center transition-colors ${
+                feedback === 'success' ? 'bg-green-50 border-green-200' :
                 feedback === 'error' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-100'
             }`}>
                 <p className={`text-sm font-medium ${
-                    feedback === 'success' ? 'text-green-600' : 
+                    feedback === 'success' ? 'text-green-600' :
                     feedback === 'error' ? 'text-red-500' : 'text-slate-700'
                 }`}>
                     {message}
@@ -216,31 +216,31 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
         </div>
 
         {/* Right Col: Stave & Input */}
-        <div className="lg:col-span-2 space-y-4">
-             <div className="bg-white rounded-xl shadow-md overflow-hidden relative">
-                <Stave 
-                    notes={userNotes} 
-                    interactive={true} 
+        <div className="lg:col-span-2 space-y-4 flex flex-col items-center">
+             <div className="w-full bg-white rounded-xl shadow-md overflow-hidden relative">
+                <Stave
+                    notes={userNotes}
+                    interactive={true}
                     selectedNoteId={selectedNoteId}
-                    onNoteClick={handleNoteClick} 
+                    onNoteClick={handleNoteClick}
                 />
              </div>
 
              {/* Action Bar */}
-             <div className="flex flex-wrap justify-between gap-2 items-center bg-slate-100 p-2 rounded-lg">
+             <div className="w-full flex flex-wrap justify-between gap-2 items-center bg-slate-100 p-2 rounded-lg">
                 <div className="flex gap-2">
-                    <button 
+                    <button
                         onClick={clearAllNotes}
                         className="flex items-center gap-1.5 px-3 py-2 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors text-xs font-medium"
                     >
                         <RefreshCw size={14} /> Очистить
                     </button>
-                    <button 
+                    <button
                         onClick={deleteSelectedNote}
                         disabled={!selectedNoteId}
                         className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors text-xs font-medium ${
-                            selectedNoteId 
-                                ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                            selectedNoteId
+                                ? 'bg-red-100 text-red-700 hover:bg-red-200'
                                 : 'text-slate-400 cursor-not-allowed'
                         }`}
                     >
@@ -249,11 +249,11 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                 </div>
 
                 <div className="flex items-center gap-2">
-                     <button 
+                     <button
                         onClick={() => setInputMode(m => m === 'write' ? 'trial' : 'write')}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-colors border ${
-                            inputMode === 'write' 
-                                ? 'bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200' 
+                            inputMode === 'write'
+                                ? 'bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200'
                                 : 'bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-200'
                         }`}
                     >
@@ -261,7 +261,7 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
                         {inputMode === 'write' ? 'Режим записи' : 'Пробный режим'}
                     </button>
 
-                    <button 
+                    <button
                         onClick={checkSolution}
                         className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg text-sm font-semibold shadow-sm transition-transform active:scale-95"
                     >
@@ -271,12 +271,14 @@ export const TrainingScreen: React.FC<TrainingScreenProps> = ({ settings, onBack
              </div>
 
              {/* Piano Keyboard Component */}
-             <PianoKeyboard 
-                octaves={settings.selectedOctaves}
-                scaleNotes={scalePool}
-                onNoteClick={handlePianoKeyClick}
-                disableNonScaleNotes={inputMode === 'write'}
-             />
+             <div className="w-full flex justify-center">
+                <PianoKeyboard
+                    octaves={settings.selectedOctaves}
+                    scaleNotes={scalePool}
+                    onNoteClick={handlePianoKeyClick}
+                    disableNonScaleNotes={inputMode === 'write'}
+                />
+             </div>
         </div>
       </div>
     </div>

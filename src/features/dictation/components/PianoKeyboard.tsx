@@ -22,16 +22,16 @@ export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
   ];
 
   return (
-    <div className="space-y-4 select-none">
+    <div className="w-full space-y-4 select-none flex flex-col items-center">
       {PIANO_ROWS.map((rowOctaves, idx) => (
-        <div key={idx} className="bg-slate-800 p-2 md:p-4 rounded-xl shadow-inner flex overflow-x-auto pb-4 custom-scrollbar justify-center">
+        <div key={idx} className="w-full bg-slate-800 p-2 md:p-4 rounded-xl shadow-inner flex overflow-x-auto pb-4 custom-scrollbar justify-center">
           {/* Flex container for octaves */}
-          <div className="flex">
+          <div className="flex justify-center">
             {rowOctaves.map(octave => (
-              <PianoOctave 
-                key={octave} 
-                octave={octave} 
-                scaleNotes={scaleNotes} 
+              <PianoOctave
+                key={octave}
+                octave={octave}
+                scaleNotes={scaleNotes}
                 onKeyClick={onNoteClick}
                 isSelected={selectedOctaves.includes(octave)}
                 restrictToScale={disableNonScaleNotes}

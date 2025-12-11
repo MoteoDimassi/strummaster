@@ -15,7 +15,7 @@ export const DictationPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-5xl">
+    <div className="w-full max-w-5xl mx-auto flex justify-center">
       {!dictationSettings ? (
         <SetupScreen onStart={handleDictationStart} />
       ) : (

@@ -62,13 +62,13 @@ export const Stave: React.FC<StaveProps> = ({
   const isFlat = (note: Note) => note.name.includes('b');
 
   return (
-    <div 
-      className="w-full overflow-x-auto bg-white rounded-lg shadow-inner border border-slate-200 p-4"
+    <div
+      className="w-full overflow-x-auto bg-white rounded-lg shadow-inner border border-slate-200 p-4 flex justify-center"
       onClick={() => interactive && onNoteClick && onNoteClick('')}
     >
-      <svg 
-        width="100%" 
-        height={VIEWBOX_HEIGHT} 
+      <svg
+        width="100%"
+        height={VIEWBOX_HEIGHT}
         viewBox={`0 0 ${Math.max(STAVE_WIDTH, notes.length * 60 + 100)} ${VIEWBOX_HEIGHT}`}
         className="min-w-[600px]"
       >
