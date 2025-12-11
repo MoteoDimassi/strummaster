@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                   onClick={() => setIsToolsDropdownOpen(false)}
                   className="block w-full text-left px-4 py-2 text-body text-text-secondary hover:bg-background-surface-tinted hover:text-brand-blue transition-colors"
                 >
-                  Музыкальный диктант
+                  Мелодический диктант
                 </Link>
               </div>
             )}
@@ -200,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({ onToolSelect }) => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block w-full text-left text-body text-text-secondary hover:text-brand-blue transition-colors"
                   >
-                    Музыкальный диктант
+                    Мелодический диктант
                   </Link>
                 </div>
               )}

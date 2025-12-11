@@ -123,7 +123,7 @@ export const LandingPage: React.FC = () => {
               },
               {
                 icon: Mic,
-                title: "Музыкальный диктант",
+                title: "Мелодический диктант",
                 description: "Тренируйте слух, определяя ноты и интервалы. Интерактивные упражнения разной сложности.",
                 color: "text-purple-500",
                 bg: "bg-purple-50"
