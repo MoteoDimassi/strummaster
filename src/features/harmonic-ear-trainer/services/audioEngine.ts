@@ -3,7 +3,7 @@ import { InstrumentType } from '../types';
 class AudioEngine {
   private audioCtx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
-  private currentInstrument: InstrumentType = 'Piano';
+  private currentInstrument: InstrumentType = 'Пианино';
   private pianoWave: PeriodicWave | null = null;
 
   constructor() {
@@ -45,12 +45,12 @@ class AudioEngine {
       const noteGain = this.audioCtx!.createGain();
 
       // Configure Oscillator based on Instrument
-      if (this.currentInstrument === 'Piano' && this.pianoWave) {
+      if (this.currentInstrument === 'Пианино' && this.pianoWave) {
         osc.setPeriodicWave(this.pianoWave);
-      } else if (this.currentInstrument === 'Synth') {
+      } else if (this.currentInstrument === 'Синтезатор') {
         osc.type = 'sawtooth';
       } else {
-        // Pad
+        // Пэд
         osc.type = 'triangle';
       }
       
@@ -68,8 +68,8 @@ class AudioEngine {
       // but AudioContext usually handles scheduling in the past by snapping to currentTime.
       noteGain.gain.setValueAtTime(0, startTime);
 
-      if (this.currentInstrument === 'Piano') {
-        // Piano: Sharp attack, immediate decay to sustain, long release
+      if (this.currentInstrument === 'Пианино') {
+        // Пианино: Резкая атака, быстрое затухание к сустейну, долгое релиз
         const attackTime = 0.02;
         const decayTime = 0.3;
         const sustainLevel = 0.3 / frequencies.length;
@@ -80,15 +80,15 @@ class AudioEngine {
         noteGain.gain.exponentialRampToValueAtTime(0.001, stopTime + 0.5); // Long Release (Pedal effect)
         
         osc.stop(stopTime + 0.5); 
-      } else if (this.currentInstrument === 'Synth') {
-        // Synth: Fast attack, constant sustain
+      } else if (this.currentInstrument === 'Синтезатор') {
+        // Синтезатор: Быстрая атака, постоянный сустейн
         noteGain.gain.linearRampToValueAtTime(0.5 / frequencies.length, startTime + 0.05);
         noteGain.gain.setValueAtTime(0.5 / frequencies.length, stopTime - 0.05);
         noteGain.gain.linearRampToValueAtTime(0.001, stopTime);
         
         osc.stop(stopTime + 0.1);
       } else {
-        // Pad: Slow attack, Full sustain
+        // Пэд: Медленная атака, полный сустейн
         noteGain.gain.linearRampToValueAtTime(0.6 / frequencies.length, startTime + 0.5); // Slow Attack
         noteGain.gain.setValueAtTime(0.6 / frequencies.length, stopTime - 0.5);
         noteGain.gain.linearRampToValueAtTime(0.001, stopTime + 0.5); // Slow Release

@@ -1,13 +1,13 @@
 export type NoteName = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B';
 
-export type TonalityType = 'Major' | 'Minor';
+export type TonalityType = 'Мажор' | 'Минор';
 
-export type InstrumentType = 'Piano' | 'Synth' | 'Pad';
+export type InstrumentType = 'Пианино' | 'Синтезатор' | 'Пэд';
 
 export enum ChordQuality {
-  MAJOR = 'Major',
-  MINOR = 'Minor',
-  DIMINISHED = 'Diminished'
+  MAJOR = 'Мажорный',
+  MINOR = 'Минорный',
+  DIMINISHED = 'Уменьшенный'
 }
 
 export enum RomanNumeral {

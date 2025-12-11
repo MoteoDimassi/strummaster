@@ -153,7 +153,7 @@ class MusicTheoryService {
   }
 
   getScaleDegrees(type: TonalityType, minorOption: MinorFifthOption = 'NATURAL'): ScaleDegree[] {
-    if (type === 'Major') return MAJOR_SCALE_DEGREES;
+    if (type === 'Мажор') return MAJOR_SCALE_DEGREES;
     
     const degrees = [...NATURAL_MINOR_SCALE_DEGREES];
     

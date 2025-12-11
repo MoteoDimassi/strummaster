@@ -6,8 +6,8 @@ export const HarmonicEarTrainerPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Harmonic Ear Trainer | StrumMaster</title>
-        <meta name="description" content="Train your ear to recognize chord progressions and scale degrees." />
+        <title>Гармонический Тренажер Слуха | StrumMaster</title>
+        <meta name="description" content="Тренируйте свой слух для распознавания гармонических последовательностей и ступеней шкалы." />
       </Helmet>
       <HarmonicEarTrainer />
     </>

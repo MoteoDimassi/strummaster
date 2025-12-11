@@ -31,7 +31,7 @@ const InstrumentSelector: React.FC<{
   compact?: boolean;
 }> = ({ current, onChange, compact = false }) => (
   <div className={`flex gap-2 ${compact ? 'text-xs' : ''}`}>
-    {(['Piano', 'Synth', 'Pad'] as InstrumentType[]).map((inst) => (
+    {(['Пианино', 'Синтезатор', 'Пэд'] as InstrumentType[]).map((inst) => (
       <button
         key={inst}
         onClick={() => onChange(inst)}
@@ -56,10 +56,10 @@ export const HarmonicEarTrainer: React.FC = () => {
   
   // Settings
   const [selectedKey, setSelectedKey] = useState<NoteName>('C');
-  const [tonalityType, setTonalityType] = useState<TonalityType>('Major');
+  const [tonalityType, setTonalityType] = useState<TonalityType>('Мажор');
   const [minorFifthOption, setMinorFifthOption] = useState<MinorFifthOption>('NATURAL');
   const [progLength, setProgLength] = useState<number>(4);
-  const [instrument, setInstrument] = useState<InstrumentType>('Piano');
+  const [instrument, setInstrument] = useState<InstrumentType>('Пианино');
   
   // New Settings State
   const [previewMode, setPreviewMode] = useState<boolean>(false);
@@ -223,9 +223,9 @@ export const HarmonicEarTrainer: React.FC = () => {
         <div className="inline-flex items-center justify-center p-4 bg-brand-blue/10 rounded-full mb-4 ring-1 ring-brand-blue/50">
           <Music2 className="w-12 h-12 text-brand-blue" />
         </div>
-        <h1 className="text-4xl font-bold text-text-primary tracking-tight">Harmonic Ear Trainer</h1>
+        <h1 className="text-4xl font-bold text-text-primary tracking-tight">Гармонический Тренажер Слуха</h1>
         <p className="text-text-secondary max-w-md mx-auto">
-          Configure your practice session. Select key, tonality, and degrees.
+          Настройте свою тренировочную сессию. Выберите тональность, лад и ступени.
         </p>
       </div>
 
@@ -233,7 +233,7 @@ export const HarmonicEarTrainer: React.FC = () => {
         {/* Key Selection */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-3 flex items-center gap-2">
-            <Settings2 size={16} /> Select Root Key
+            <Settings2 size={16} /> Выберите основную тональность
           </label>
           <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
             {musicTheory.getAllKeys().map((key) => (
@@ -256,9 +256,9 @@ export const HarmonicEarTrainer: React.FC = () => {
           {/* Tonality & Instrument */}
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-3">Tonality</label>
+              <label className="block text-sm font-medium text-text-secondary mb-3">Лад</label>
               <div className="flex bg-background-surface-tinted p-1 rounded-lg">
-                {(['Major', 'Minor'] as TonalityType[]).map((type) => (
+                {(['Мажор', 'Минор'] as TonalityType[]).map((type) => (
                   <button
                     key={type}
                     onClick={() => setTonalityType(type)}
@@ -274,14 +274,14 @@ export const HarmonicEarTrainer: React.FC = () => {
               </div>
               
               {/* Minor 5th Option */}
-              {tonalityType === 'Minor' && (
+              {tonalityType === 'Минор' && (
                 <div className="mt-4 animate-in fade-in slide-in-from-top-2">
-                  <label className="block text-xs font-medium text-text-secondary mb-2">5th Degree Quality</label>
+                  <label className="block text-xs font-medium text-text-secondary mb-2">Качество V ступени</label>
                   <div className="flex flex-col gap-1">
                      {[
-                       { id: 'NATURAL', label: 'Natural (v)', desc: 'Minor 5th' },
-                       { id: 'HARMONIC', label: 'Harmonic (V)', desc: 'Major 5th' },
-                       { id: 'BOTH', label: 'Mixed (v & V)', desc: 'Both Types' }
+                       { id: 'NATURAL', label: 'Натуральный (v)', desc: 'Минорная квинта' },
+                       { id: 'HARMONIC', label: 'Гармонический (V)', desc: 'Мажорная квинта' },
+                       { id: 'BOTH', label: 'Смешанный (v & V)', desc: 'Оба типа' }
                      ].map((opt) => (
                         <button
                           key={opt.id}
@@ -304,7 +304,7 @@ export const HarmonicEarTrainer: React.FC = () => {
             {/* Instrument Selection */}
             <div>
                 <label className="block text-sm font-medium text-text-secondary mb-3 flex items-center gap-2">
-                   <Mic2 size={16} /> Sound
+                   <Mic2 size={16} /> Звук
                 </label>
                 <InstrumentSelector current={instrument} onChange={setInstrument} />
             </div>
@@ -312,7 +312,7 @@ export const HarmonicEarTrainer: React.FC = () => {
 
           {/* Length Selection */}
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-3">Progression Length</label>
+            <label className="block text-sm font-medium text-text-secondary mb-3">Длина последовательности</label>
             <div className="flex items-center gap-4">
                <input
                  type="range"
@@ -326,15 +326,15 @@ export const HarmonicEarTrainer: React.FC = () => {
                <span className="text-xl font-bold text-brand-blue w-8 text-center">{progLength}</span>
             </div>
              <p className="text-xs text-text-secondary mt-2">
-              Number of chords in the sequence.
-            </p>
+              Количество аккордов в последовательности.
+             </p>
           </div>
         </div>
 
         {/* Scale Degree Selection */}
         <div>
            <label className="block text-sm font-medium text-text-secondary mb-3 flex items-center gap-2">
-             <Filter size={16} /> Active Scale Degrees
+             <Filter size={16} /> Активные ступени лада
            </label>
            <div className="flex flex-wrap gap-2">
               {allDegrees.map((degree) => {
@@ -352,7 +352,7 @@ export const HarmonicEarTrainer: React.FC = () => {
                               : 'bg-background-surface-tinted border-transparent text-text-secondary hover:border-accents-neutral-border'}
                            ${isTonic ? 'opacity-80 cursor-default' : 'cursor-pointer active:scale-95'}
                         `}
-                        title={isTonic ? "Tonic must be active" : `Toggle ${degree.roman}`}
+                        title={isTonic ? "Тоника должна быть активна" : `Переключить ${degree.roman}`}
                       >
                          <span className="text-sm md:text-base font-bold">{degree.roman}</span>
                          {isActive && <div className="w-1.5 h-1.5 rounded-full bg-brand-blue mt-1" />}
@@ -361,13 +361,13 @@ export const HarmonicEarTrainer: React.FC = () => {
               })}
            </div>
            <p className="text-xs text-text-secondary mt-2">
-             Click to toggle. Only selected degrees will be used in the progression.
+             Нажмите для переключения. Только выбранные ступени будут использоваться в последовательности.
            </p>
         </div>
 
         <div className="pt-6 border-t border-accents-neutral-border">
            <Button onClick={startGame} className="w-full py-4 text-lg">
-             Start Practice
+             Начать тренировку
            </Button>
         </div>
       </Card>
@@ -386,7 +386,7 @@ export const HarmonicEarTrainer: React.FC = () => {
              <button
                 onClick={() => setIsSettingsOpen(!isSettingsOpen)}
                 className={`p-2 rounded-lg border transition-all ${isSettingsOpen ? 'bg-brand-blue/10 border-brand-blue text-brand-blue' : 'bg-background-surface-tinted border-accents-neutral-border text-text-secondary hover:text-text-primary'}`}
-                title="Sound Settings"
+                title="Настройки звука"
              >
                 <Settings2 size={18} />
              </button>
@@ -395,14 +395,14 @@ export const HarmonicEarTrainer: React.FC = () => {
                <div className="absolute top-full left-0 mt-2 p-4 bg-background-secondary border border-accents-neutral-border rounded-lg shadow-xl z-50 w-72 animate-in fade-in zoom-in-95">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2">
-                        <Music2 size={12} /> Audio Settings
+                        <Music2 size={12} /> Настройки аудио
                     </span>
                     <button onClick={() => setIsSettingsOpen(false)} className="text-text-secondary hover:text-text-primary"><X size={14}/></button>
                   </div>
                   
                   <div className="space-y-4">
                       <div>
-                          <label className="text-xs text-text-secondary mb-2 block">Instrument</label>
+                          <label className="text-xs text-text-secondary mb-2 block">Инструмент</label>
                           <InstrumentSelector current={instrument} onChange={setInstrument} compact />
                       </div>
 
@@ -410,9 +410,9 @@ export const HarmonicEarTrainer: React.FC = () => {
                           <label className="flex items-center justify-between cursor-pointer group">
                              <div className="flex flex-col">
                                  <span className="text-sm font-medium text-text-primary transition-colors flex items-center gap-2">
-                                     <Ear size={14} /> Preview Chords
+                                     <Ear size={14} /> Предпросмотр аккордов
                                  </span>
-                                 <span className="text-[10px] text-text-secondary">Play sound when selecting answer</span>
+                                 <span className="text-[10px] text-text-secondary">Воспроизводить звук при выборе ответа</span>
                              </div>
                              
                              <div className="relative">
@@ -432,9 +432,9 @@ export const HarmonicEarTrainer: React.FC = () => {
 
              <div className="bg-background-surface-tinted px-3 py-2 rounded-lg text-sm font-mono text-brand-blue border border-accents-neutral-border shadow-inner flex flex-col leading-none justify-center h-10">
                 <span className="font-bold">{selectedKey} {tonalityType}</span>
-                {tonalityType === 'Minor' && (
+                {tonalityType === 'Минор' && (
                     <span className="text-[10px] opacity-70">
-                        {minorFifthOption === 'NATURAL' ? 'Natural' : minorFifthOption === 'HARMONIC' ? 'Harmonic' : 'Mixed'}
+                        {minorFifthOption === 'NATURAL' ? 'Натуральный' : minorFifthOption === 'HARMONIC' ? 'Гармонический' : 'Смешанный'}
                     </span>
                 )}
              </div>
@@ -453,10 +453,10 @@ export const HarmonicEarTrainer: React.FC = () => {
                 onClick={playTonic}
                 disabled={isPlaying}
                 className="flex items-center gap-2 px-3 py-2 bg-background-surface-tinted hover:bg-accents-neutral-border border border-accents-neutral-border rounded-lg text-green-600 hover:text-green-700 font-medium disabled:opacity-50 transition-colors"
-                title="Play Tonic Chord"
+                title="Воспроизвести тонический аккорд"
             >
                 <Home size={18} />
-                <span className="hidden sm:inline">Tonic</span>
+                <span className="hidden sm:inline">Тоника</span>
             </button>
             
             <button
@@ -465,10 +465,10 @@ export const HarmonicEarTrainer: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-brand-blue hover:bg-brand-hover rounded-lg text-white font-medium disabled:opacity-50 transition-colors shadow-lg shadow-brand-blue/20"
             >
                 <Play size={18} fill={isPlaying ? "currentColor" : "none"} />
-                {isPlaying ? 'Playing...' : 'Replay'}
+                {isPlaying ? 'Воспроизведение...' : 'Повторить'}
             </button>
             <Button variant="ghost" onClick={resetGame} className="text-sm">
-                <RotateCcw size={16} /> Exit
+                <RotateCcw size={16} /> Выход
             </Button>
         </div>
       </div>
@@ -601,14 +601,14 @@ export const HarmonicEarTrainer: React.FC = () => {
         {roundStatus === 'SUCCESS' ? (
           <div className="flex flex-col items-center gap-4 animate-in slide-in-from-bottom-2">
             <div className="flex items-center gap-2 text-xl font-bold text-green-600">
-               <Trophy /> Perfect!
+               <Trophy /> Идеально!
             </div>
             <div className="flex gap-4">
               <Button onClick={() => playProgression(progression)} variant="secondary">
-                <Play size={18} /> Listen Again
+                <Play size={18} /> Слушать снова
               </Button>
               <Button onClick={startGame} variant="primary">
-                 Next Progression
+                 Следующая последовательность
               </Button>
             </div>
           </div>
@@ -620,11 +620,11 @@ export const HarmonicEarTrainer: React.FC = () => {
                 variant={roundStatus === 'ERROR' ? 'danger' : 'primary'}
                 className="w-full py-3 text-lg"
               >
-                {roundStatus === 'ERROR' ? 'Try Again' : 'Check Answers'}
+                {roundStatus === 'ERROR' ? 'Попробовать снова' : 'Проверить ответы'}
               </Button>
               {roundStatus === 'ERROR' && checkedResults.wrong.length > 0 && (
                   <p className="text-destructive text-sm flex items-center gap-1 animate-pulse">
-                      <XCircle size={14} /> Incorrect choices are highlighted. Don't give up!
+                      <XCircle size={14} /> Неверные варианты выделены. Не сдавайтесь!
                   </p>
               )}
           </div>
