@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setRootNoteIndex, setRandomRoot, toggleChordTypeSelection, generateTask, resetScore } from '../../../store/slices/chordTrainerSlice';
+import { setRootNoteIndex, setRandomRoot, toggleOctaveSelection, toggleChordTypeSelection, generateTask, resetScore } from '../../../store/slices/chordTrainerSlice';
 import { NOTE_NAMES, CHORD_TYPES } from '../utils/musicTheory';
 import { Settings, X, Shuffle } from 'lucide-react';
 
@@ -12,7 +12,7 @@ interface TrainerSettingsProps {
 
 const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = false, onClose }) => {
   const dispatch = useAppDispatch();
-  const { rootNoteIndex, isRandomRoot, selectedChordIndices } = useAppSelector((state) => state.chordTrainer);
+  const { rootNoteIndex, isRandomRoot, selectedOctaves, selectedChordIndices } = useAppSelector((state) => state.chordTrainer);
 
   const handleStart = () => {
     dispatch(resetScore());
@@ -75,6 +75,29 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
                         {note}
                     </button>
                 ))}
+            </div>
+        </div>
+
+        {/* Octave Selection */}
+        <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">Select Octaves</h3>
+            <p className="text-sm text-gray-500">Chords will be generated within these octaves.</p>
+            <div className="flex flex-wrap gap-3">
+                {[3, 4, 5].map((octave) => {
+                    const octaveName = octave === 3 ? 'Small Octave' : octave === 4 ? '1st Octave' : '2nd Octave';
+                    return (
+                        <button
+                            key={octave}
+                            onClick={() => dispatch(toggleOctaveSelection(octave))}
+                            className={`px-4 py-2 rounded-lg border transition-all duration-200 font-medium
+                                ${selectedOctaves.includes(octave)
+                                    ? 'border-brand-blue bg-blue-50 text-brand-blue ring-1 ring-brand-blue'
+                                    : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}
+                        >
+                            {octaveName} ({octave})
+                        </button>
+                    );
+                })}
             </div>
         </div>
 

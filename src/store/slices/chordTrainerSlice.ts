@@ -6,6 +6,7 @@ interface ChordTrainerState {
   // Settings
   rootNoteIndex: number; // 0 = C, 1 = C#, etc.
   isRandomRoot: boolean; // If true, rootNoteIndex is ignored for generation
+  selectedOctaves: number[]; // Array of octaves (e.g., [3, 4])
   selectedChordIndices: number[]; // Indices mapping to CHORD_TYPES
   
   // Session
@@ -26,6 +27,7 @@ interface ChordTrainerState {
 const initialState: ChordTrainerState = {
   rootNoteIndex: 0, // Default C
   isRandomRoot: false,
+  selectedOctaves: [3, 4], // Default octaves 3 and 4
   selectedChordIndices: [0, 1], // Default Major, Minor
   score: 0,
   taskSolved: false,
@@ -45,6 +47,17 @@ const chordTrainerSlice = createSlice({
     setRandomRoot: (state, action: PayloadAction<boolean>) => {
       state.isRandomRoot = action.payload;
     },
+    toggleOctaveSelection: (state, action: PayloadAction<number>) => {
+      const octave = action.payload;
+      if (state.selectedOctaves.includes(octave)) {
+        // Prevent deselecting if it's the last one
+        if (state.selectedOctaves.length > 1) {
+          state.selectedOctaves = state.selectedOctaves.filter(o => o !== octave);
+        }
+      } else {
+        state.selectedOctaves.push(octave);
+      }
+    },
     toggleChordTypeSelection: (state, action: PayloadAction<number>) => {
       const index = action.payload;
       if (state.selectedChordIndices.includes(index)) {
@@ -59,9 +72,10 @@ const chordTrainerSlice = createSlice({
     generateTask: (state) => {
       // Logic to pick a random chord from selected types
       // Root note is fixed by settings, but octave can vary around middle C (60)
-      // For this trainer, let's keep the bass note within 48 (C3) to 60 (C4)
       
-      const octaveOffset = 48 + Math.floor(Math.random() * 2) * 12; // C3 or C4 base
+      // Select random octave from enabled octaves
+      const randomOctave = state.selectedOctaves[Math.floor(Math.random() * state.selectedOctaves.length)];
+      const octaveOffset = (randomOctave + 1) * 12; // MIDI octave calculation (C3 is 48, so octave 3 -> 48)
       
       let currentRootIndex = state.rootNoteIndex;
       if (state.isRandomRoot) {
@@ -116,6 +130,7 @@ const chordTrainerSlice = createSlice({
 export const {
   setRootNoteIndex,
   setRandomRoot,
+  toggleOctaveSelection,
   toggleChordTypeSelection,
   generateTask,
   toggleNote,
