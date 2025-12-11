@@ -17,6 +17,7 @@ const CoursesPage = lazy(() => import('./pages/CoursesPage').then(module => ({ d
 const TabsPage = lazy(() => import('./pages/TabsPage').then(module => ({ default: module.TabsPage })));
 const MetronomePage = lazy(() => import('./pages/MetronomePage').then(module => ({ default: module.MetronomePage })));
 const ChordTrainerPage = lazy(() => import('./pages/ChordTrainerPage').then(module => ({ default: module.ChordTrainerPage })));
+const HarmonicEarTrainerPage = lazy(() => import('./pages/HarmonicEarTrainerPage').then(module => ({ default: module.HarmonicEarTrainerPage })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-[50vh]">
@@ -42,6 +43,7 @@ const App: React.FC = () => {
                   <Route path="tabs" element={<TabsPage />} />
                   <Route path="metronome" element={<MetronomePage />} />
                   <Route path="chord-trainer" element={<ChordTrainerPage />} />
+                  <Route path="harmonic-ear-trainer" element={<HarmonicEarTrainerPage />} />
                 </Route>
               </Routes>
             </Suspense>
