@@ -64,7 +64,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-lg mt-10 border border-slate-100 text-slate-900">
+    <div className="w-[576px] mx-auto p-6 bg-white rounded-xl shadow-lg mt-10 border border-slate-100 text-slate-900">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-blue-600 rounded-lg text-white">
             <Music size={24} />
