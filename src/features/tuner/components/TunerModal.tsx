@@ -1,68 +1,24 @@
 import React, { useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '../../../store/hooks';
-import { 
-  closeTuner, 
-  setTunerMode, 
-  startTuner, 
-  stopTuner, 
-  updateTunerResult,
-  setTunerError 
-} from '../../../store/slices/tunerSlice';
-import { TunerMode } from '../../../store/slices/tunerSlice';
-import { tunerService } from '../services/TunerService';
+import { useAppDispatch } from '../../../store/hooks';
+import { closeTuner } from '../../../store/slices/tunerSlice';
 import { TunerDisplay } from './TunerDisplay';
 import { TunerControls } from './TunerControls';
+import { useTuner } from '../hooks/useTuner';
 
 export const TunerModal: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { isOpen, isRunning, mode, error } = useAppSelector(state => state.tuner);
+  const { isRunning, mode, error, isOpen, start, stop, toggle, changeMode } = useTuner();
 
   useEffect(() => {
-    if (isOpen && !isRunning) {
-      startTunerService();
-    } else if (!isOpen && isRunning) {
-      stopTunerService();
+    if (isOpen) {
+      start();
+    } else {
+      stop();
     }
-
-    return () => {
-      if (isRunning) {
-        stopTunerService();
-      }
-    };
-  }, [isOpen, isRunning]);
-
-  const startTunerService = async () => {
-    console.log('[TunerModal] Запуск тюнера через tunerService');
-    try {
-      await tunerService.start();
-      dispatch(startTuner());
-      
-      // Start continuous analysis
-      tunerService.startContinuousAnalysis((result) => {
-        console.log('[TunerModal] Получен результат от tunerService:', result);
-        if (result) {
-          dispatch(updateTunerResult(result));
-        }
-      });
-    } catch (err) {
-      console.error('[TunerModal] Ошибка при запуске тюнера:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Не удалось запустить тюнер';
-      dispatch(setTunerError(errorMessage));
-    }
-  };
-
-  const stopTunerService = () => {
-    tunerService.stop();
-    dispatch(stopTuner());
-  };
+  }, [isOpen, start, stop]);
 
   const handleClose = () => {
     dispatch(closeTuner());
-  };
-
-  const handleModeChange = (newMode: TunerMode) => {
-    dispatch(setTunerMode(newMode));
-    tunerService.setMode(newMode);
   };
 
   if (!isOpen) return null;
@@ -96,8 +52,8 @@ export const TunerModal: React.FC = () => {
         <TunerControls
           isRunning={isRunning}
           mode={mode}
-          onToggle={isRunning ? stopTunerService : startTunerService}
-          onModeChange={handleModeChange}
+          onToggle={toggle}
+          onModeChange={changeMode}
         />
 
         {/* Дисплей тюнера */}
