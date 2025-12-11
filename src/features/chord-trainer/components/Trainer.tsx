@@ -23,15 +23,15 @@ const Trainer: React.FC = () => {
 
   // Auto-play sound when task changes
   useEffect(() => {
-    if (currentTask) {
+    if (currentTask && gameStarted) {
         audioService.resume().then(() => {
             const timer = setTimeout(() => {
                 audioService.playChord(currentTask.notes);
-            }, 350); 
+            }, 350);
             return () => clearTimeout(timer);
         });
     }
-  }, [currentTask]);
+  }, [currentTask, gameStarted]);
 
   // Check logic helper
   const isCorrect = React.useMemo(() => {
