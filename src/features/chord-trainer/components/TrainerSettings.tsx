@@ -1,8 +1,8 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { setRootNoteIndex, toggleChordTypeSelection, generateTask, resetScore } from '../../../store/slices/chordTrainerSlice';
+import { setRootNoteIndex, setRandomRoot, toggleChordTypeSelection, generateTask, resetScore } from '../../../store/slices/chordTrainerSlice';
 import { NOTE_NAMES, CHORD_TYPES } from '../utils/musicTheory';
-import { Settings, X } from 'lucide-react';
+import { Settings, X, Shuffle } from 'lucide-react';
 
 interface TrainerSettingsProps {
   onStart: () => void;
@@ -12,7 +12,7 @@ interface TrainerSettingsProps {
 
 const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = false, onClose }) => {
   const dispatch = useAppDispatch();
-  const { rootNoteIndex, selectedChordIndices } = useAppSelector((state) => state.chordTrainer);
+  const { rootNoteIndex, isRandomRoot, selectedChordIndices } = useAppSelector((state) => state.chordTrainer);
 
   const handleStart = () => {
     dispatch(resetScore());
@@ -40,18 +40,36 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = fa
 
         {/* Root Note Selection */}
         <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">
-                Select Root Note
-            </h3>
-            <p className="text-sm text-gray-500">The chord questions will be based on this root note (transposed randomly within octaves).</p>
-            <div className="grid grid-cols-6 sm:grid-cols-12 gap-2">
+            <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800">
+                    Select Root Note
+                </h3>
+                <button
+                    onClick={() => dispatch(setRandomRoot(!isRandomRoot))}
+                    className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all
+                        ${isRandomRoot
+                            ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                >
+                    <Shuffle size={16} />
+                    <span>Random Root</span>
+                </button>
+            </div>
+            
+            <p className="text-sm text-gray-500">
+                {isRandomRoot
+                    ? "Chords will be generated from random root notes."
+                    : "The chord questions will be based on this root note (transposed randomly within octaves)."}
+            </p>
+
+            <div className={`grid grid-cols-6 sm:grid-cols-12 gap-2 transition-opacity duration-200 ${isRandomRoot ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                 {NOTE_NAMES.map((note, index) => (
                     <button
                         key={note}
                         onClick={() => dispatch(setRootNoteIndex(index))}
                         className={`py-2 px-1 rounded-md text-sm font-medium transition-all duration-200
-                            ${rootNoteIndex === index 
-                                ? 'bg-brand-blue text-white shadow-md transform scale-105' 
+                            ${rootNoteIndex === index && !isRandomRoot
+                                ? 'bg-brand-blue text-white shadow-md transform scale-105'
                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                     >
                         {note}

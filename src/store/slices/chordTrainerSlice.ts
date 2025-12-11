@@ -5,6 +5,7 @@ import { generateChordMidi } from '../../features/chord-trainer/utils/chordLogic
 interface ChordTrainerState {
   // Settings
   rootNoteIndex: number; // 0 = C, 1 = C#, etc.
+  isRandomRoot: boolean; // If true, rootNoteIndex is ignored for generation
   selectedChordIndices: number[]; // Indices mapping to CHORD_TYPES
   
   // Session
@@ -24,6 +25,7 @@ interface ChordTrainerState {
 
 const initialState: ChordTrainerState = {
   rootNoteIndex: 0, // Default C
+  isRandomRoot: false,
   selectedChordIndices: [0, 1], // Default Major, Minor
   score: 0,
   taskSolved: false,
@@ -38,6 +40,10 @@ const chordTrainerSlice = createSlice({
   reducers: {
     setRootNoteIndex: (state, action: PayloadAction<number>) => {
       state.rootNoteIndex = action.payload;
+      state.isRandomRoot = false; // Disable random if specific root selected
+    },
+    setRandomRoot: (state, action: PayloadAction<boolean>) => {
+      state.isRandomRoot = action.payload;
     },
     toggleChordTypeSelection: (state, action: PayloadAction<number>) => {
       const index = action.payload;
@@ -56,7 +62,13 @@ const chordTrainerSlice = createSlice({
       // For this trainer, let's keep the bass note within 48 (C3) to 60 (C4)
       
       const octaveOffset = 48 + Math.floor(Math.random() * 2) * 12; // C3 or C4 base
-      const rootMidi = octaveOffset + state.rootNoteIndex;
+      
+      let currentRootIndex = state.rootNoteIndex;
+      if (state.isRandomRoot) {
+        currentRootIndex = Math.floor(Math.random() * 12);
+      }
+
+      const rootMidi = octaveOffset + currentRootIndex;
       
       const randomTypeIndex = state.selectedChordIndices[Math.floor(Math.random() * state.selectedChordIndices.length)];
       const chordType = CHORD_TYPES[randomTypeIndex];
@@ -101,11 +113,12 @@ const chordTrainerSlice = createSlice({
   },
 });
 
-export const { 
-  setRootNoteIndex, 
-  toggleChordTypeSelection, 
-  generateTask, 
-  toggleNote, 
+export const {
+  setRootNoteIndex,
+  setRandomRoot,
+  toggleChordTypeSelection,
+  generateTask,
+  toggleNote,
   setDetectedChordName,
   clearNotes,
   markTaskSolved,
