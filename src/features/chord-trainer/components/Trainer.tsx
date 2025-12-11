@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { generateTask, setDetectedChordName, clearNotes, toggleNote, markTaskSolved } from '../../../store/slices/chordTrainerSlice';
 import { identifyChordFromMidi } from '../utils/chordLogic';
@@ -6,19 +6,20 @@ import { audioService } from '../services/audioService';
 import Piano from './Piano';
 import Staff from './Staff';
 import TrainerSettings from './TrainerSettings';
-import { Volume2, ArrowRight, RefreshCw, CheckCircle2, AudioLines, Trophy, Settings } from 'lucide-react';
+import { Volume2, ArrowRight, RefreshCw, CheckCircle2, AudioLines, Trophy, Settings, RotateCcw } from 'lucide-react';
 
 const Trainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const { currentTask, activeNotes, detectedChordName, score, taskSolved } = useAppSelector((state) => state.chordTrainer);
-  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
 
   // Initialize task if none exists
   useEffect(() => {
-    if (!currentTask) {
+    if (gameStarted && !currentTask) {
         dispatch(generateTask());
     }
-  }, [currentTask, dispatch]);
+  }, [currentTask, dispatch, gameStarted]);
 
   // Auto-play sound when task changes
   useEffect(() => {
@@ -85,6 +86,10 @@ const Trainer: React.FC = () => {
     dispatch(toggleNote(midi));
   };
 
+  if (!gameStarted) {
+    return <TrainerSettings onStart={() => setGameStarted(true)} />;
+  }
+
   if (!currentTask) return null;
 
   return (
@@ -102,17 +107,33 @@ const Trainer: React.FC = () => {
             </div>
         </div>
 
-        <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Settings"
-        >
-            <Settings size={24} />
-        </button>
+        <div className="flex items-center space-x-2">
+            <button
+                onClick={() => setGameStarted(false)}
+                className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
+                title="Exit"
+            >
+                <RotateCcw size={20} />
+                <span className="hidden sm:inline text-sm font-medium">Exit</span>
+            </button>
+            <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Settings"
+            >
+                <Settings size={24} />
+            </button>
+        </div>
       </div>
 
       {/* Settings Modal */}
-      {isSettingsOpen && <TrainerSettings onClose={() => setIsSettingsOpen(false)} />}
+      {isSettingsOpen && (
+        <TrainerSettings
+            isModal
+            onClose={() => setIsSettingsOpen(false)}
+            onStart={() => setIsSettingsOpen(false)}
+        />
+      )}
 
       {/* Controls Area */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-6">

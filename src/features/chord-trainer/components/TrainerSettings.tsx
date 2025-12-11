@@ -5,34 +5,37 @@ import { NOTE_NAMES, CHORD_TYPES } from '../utils/musicTheory';
 import { Settings, X } from 'lucide-react';
 
 interface TrainerSettingsProps {
-  onClose: () => void;
+  onStart: () => void;
+  isModal?: boolean;
+  onClose?: () => void;
 }
 
-const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onClose }) => {
+const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onStart, isModal = false, onClose }) => {
   const dispatch = useAppDispatch();
   const { rootNoteIndex, selectedChordIndices } = useAppSelector((state) => state.chordTrainer);
 
-  const handleApply = () => {
+  const handleStart = () => {
     dispatch(resetScore());
     dispatch(generateTask());
-    onClose();
+    onStart();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
+  const content = (
+    <div className={`bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 md:p-8 space-y-6 ${isModal ? 'max-h-[90vh] overflow-y-auto' : ''}`}>
         
         <div className="flex items-center justify-between border-b border-gray-100 pb-4">
             <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                 <Settings className="mr-3 text-brand-blue" size={28} />
-                Trainer Settings
+                {isModal ? 'Trainer Settings' : 'Chord Trainer Setup'}
             </h2>
-            <button 
-                onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
-            >
-                <X size={24} />
-            </button>
+            {isModal && onClose && (
+                <button 
+                    onClick={onClose}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
+                >
+                    <X size={24} />
+                </button>
+            )}
         </div>
 
         {/* Root Note Selection */}
@@ -81,23 +84,34 @@ const TrainerSettings: React.FC<TrainerSettingsProps> = ({ onClose }) => {
 
         {/* Action */}
         <div className="pt-4 flex justify-end space-x-4">
+            {isModal && onClose && (
+                <button
+                    onClick={onClose}
+                    className="px-6 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-100 transition-colors"
+                >
+                    Cancel
+                </button>
+            )}
             <button
-                onClick={onClose}
-                className="px-6 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-100 transition-colors"
-            >
-                Cancel
-            </button>
-            <button
-                onClick={handleApply}
+                onClick={handleStart}
                 disabled={selectedChordIndices.length === 0}
-                className="px-8 py-3 bg-brand-blue hover:bg-brand-hover text-white rounded-xl font-bold shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-8 py-3 bg-brand-blue hover:bg-brand-hover text-white rounded-xl font-bold shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
-                Apply & Restart
+                {isModal ? 'Apply & Restart' : 'Start Training'}
             </button>
         </div>
       </div>
-    </div>
   );
+
+  if (isModal) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            {content}
+        </div>
+    );
+  }
+
+  return <div className="flex justify-center w-full">{content}</div>;
 };
 
 export default TrainerSettings;
